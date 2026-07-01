@@ -1,0 +1,42 @@
+[app]
+name = My App
+env = production
+
+[cors]
+access_control_allow_origin = '*'
+# access_control_allow_methods = 'GET, POST, OPTIONS'
+# access_control_allow_headers = 'Content-Type, Authorization'
+# access_control_allow_credentials = False
+
+[database]
+default = database_sqlite
+
+# database driver must be one of:
+# - mysql
+# - postgres
+# - sqlite
+
+[database_mysql]
+driver = mysql
+host = 127.0.0.1
+port = 3306
+database = docker
+username = root
+password = docker
+autocommit = True
+# ssl_ca = [relative path to pem]
+# ssl_verify_identity = True
+
+[database_postgres]
+driver = postgres
+host = 127.0.0.1
+port = 5432
+database = docker
+username = docker
+password = docker
+autocommit = True
+
+[database_sqlite]
+driver = sqlite
+database = app.db
+autocommit = True
