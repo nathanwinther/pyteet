@@ -1,4 +1,4 @@
-from pyteet import Log
+from pyteet import database_close, Log
 
 import importlib
 import sys
@@ -22,6 +22,8 @@ def commands(name=None):
             continue
         for file in path.iterdir():
             if not file.is_file():
+                continue
+            if file.suffix != '.py':
                 continue
             module_name = f'{prefix}.{file.stem}'
             module = importlib.import_module(module_name)
@@ -53,7 +55,7 @@ if __name__ == '__main__':
                 raise e
             finally:
                 Log.debug('command cleanup')
-                # @TODO call database_close
+                database_close()
         else:
             raise ValueError(f'{sys.argv[1]} command not found.')
 

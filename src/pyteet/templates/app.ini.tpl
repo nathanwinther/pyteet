@@ -1,13 +1,12 @@
 [app]
 name = My App
 env = production
-version = 1.0
 
 [cors]
 access_control_allow_origin = '*'
-#access_control_allow_methods = 'GET, POST, OPTIONS'
-#access_control_allow_headers = 'Content-Type, Authorization'
-#access_control_allow_credentials = False
+# access_control_allow_methods = 'GET, POST, OPTIONS'
+# access_control_allow_headers = 'Content-Type, Authorization'
+# access_control_allow_credentials = False
 
 [database]
 default = database_sqlite
@@ -25,6 +24,8 @@ database = docker
 username = root
 password = docker
 autocommit = True
+# ssl_ca = [relative path to pem]
+# ssl_verify_identity = True
 
 [database_postgres]
 driver = postgres
@@ -34,8 +35,6 @@ database = docker
 username = docker
 password = docker
 autocommit = True
-#ssl_ca = [relative path to pem]
-#ssl_verify_identity = True
 
 [database_sqlite]
 driver = sqlite

@@ -1,9 +1,7 @@
-from pyteet import database
+from pyteet import DATETIME_DB, database
 
 import copy
 from datetime import datetime, UTC
-
-DATETIME = '%Y-%m-%d %H:%M:%S'
 
 class Model:
 
@@ -103,7 +101,7 @@ class Model:
                 data[k] = Model.for_api(self, v, True)
             return data
         if isinstance(data, datetime):
-            return data.strftime(DATETIME)
+            return data.strftime(DATETIME_DB)
         if isinstance(data, Model):
             return data.for_api()
         return data
@@ -113,7 +111,7 @@ class Model:
             # Nothing to save
             return
         pk = getattr(self, self.PRIMARY_KEY)
-        dt = datetime.now(UTC).strftime(DATETIME)
+        dt = datetime.now(UTC).strftime(DATETIME_DB)
         db = database(self.CONNECTION)
         is_insert = pk == None
         if is_insert:

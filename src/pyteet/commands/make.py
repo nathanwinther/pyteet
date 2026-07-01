@@ -2,6 +2,7 @@ from pyteet import camel_to_snake, render_template
 
 import argparse
 import importlib
+from datetime import datetime, UTC
 from pathlib import Path
 
 NAME = 'make'
@@ -49,10 +50,19 @@ def _controller(name):
     print(f'created: {path.as_posix()}')
 
 def _migration(name):
-    # @TODO
-    pass
+    proj_root = Path().cwd()
+    prefix = datetime.now(UTC).strftime('%Y%m%d%H%M%S')
+    name = f'{prefix}_{camel_to_snake(name)}'
+    path = proj_root / 'migrations' / f'{name}.py'
+    with open(path.as_posix(), 'w') as w:
+        w.write(render_template('migration.py.tpl', name=name))
+    print(f'created: {path.as_posix()}')
 
 def _model(name):
-    # @TODO
-    pass
+    proj_root = Path().cwd()
+    table = camel_to_snake(name)
+    path = proj_root / 'models' / f'{table}.py'
+    with open(path.as_posix(), 'w') as w:
+        w.write(render_template('model.py.tpl', name=name, table=table))
+    print(f'created: {path.as_posix()}')
 

@@ -1,4 +1,6 @@
 .DS_Store
 **/.venv/**
 **/__pycache__/**
-dist/**
+app.db
+app.ini
+

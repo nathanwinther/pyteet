@@ -44,9 +44,12 @@ def send_json(data, status=200):
             mimetype='application/json',
             status=status)
 
-def send_success(data=None, message='OK'):
+def send_success(data=None, message='OK', meta=None):
+    message = message if message else 'OK'
     payload = {'success': True, 'message': message}
     if data:
         payload['data'] = data
+    if meta:
+        payload['meta'] = meta
     return send_json(payload)
 

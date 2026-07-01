@@ -4,6 +4,8 @@ import copy
 import re
 import threading
 
+DATETIME_DB = '%Y-%m-%d %H:%M:%S'
+
 _conn_pool = {}
 
 def database(name=None):
