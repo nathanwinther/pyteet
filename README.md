@@ -12,8 +12,6 @@ web application framework. It is a simple wrapper around
 - [Commands](#commands)
 - [License](#license)
 
-## About
-
 ## Installation
 
 ```console
@@ -39,6 +37,42 @@ Create your own commands
 
 ```console
 python3 -m pyteet make command orders
+```
+
+Create a controller
+
+```console
+python3 -m pyteet make controller contact
+```
+
+Create a model
+
+```console
+python3 -m pyteet make model Contact
+```
+
+Create a database migration
+
+```console
+python3 -m pyteet make migration create_contacts
+```
+
+View database migrations
+
+```console
+python3 -m pyteet migrate status
+```
+
+Run database migrations
+
+```console
+python3 -m pyteet migrate run
+```
+
+Rollback database migrations
+
+```console
+python3 -m pyteet migrate rollback
 ```
 
 ## License
