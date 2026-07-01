@@ -6,11 +6,8 @@ web application framework. It is a simple wrapper around
 [Jinja](https://jinja.palletsprojects.com/) inspired by
 [Laravel](https://laravel.com).
 
-----
-
 ## Table of Contents
 
-- [About](#about)
 - [Installation](#installation)
 - [Commands](#commands)
 - [License](#license)
