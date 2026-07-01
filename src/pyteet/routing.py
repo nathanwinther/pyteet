@@ -1,3 +1,5 @@
+from pyteet import config, parsebool
+
 import importlib
 from werkzeug.exceptions import HTTPException
 from werkzeug.routing import Map, Rule
@@ -31,6 +33,27 @@ class Router:
     def wsgi_app(self, environ, start_response):
         request = Request(environ)
         response = self.dispatch_request(request)
+        # CORS
+        cors = [
+                {'key': 'cors.access_control_allow_origin',
+                 'type': str,
+                 'header': 'Access-Control-Allow-Origin'},
+                {'key': 'cors.access_control_allow_methods',
+                 'type': str,
+                 'header': 'Access-Control-Allow-Methods'},
+                {'key': 'cors.access_control_allow_headers',
+                 'type': str,
+                 'header': 'Access-Control-Allow-Headers'},
+                {'key': 'cors.access_control_allow_credentials',
+                 'type': bool,
+                 'header': 'Access-Control-Allow-Credentials'},
+                ]
+        for item in cors:
+            v = config(item['key'])
+            if v:
+                if item['type'] == bool:
+                    v = parsebool(v)
+                response.headers.update({f'{item['header']}': v})
         return response(environ, start_response)
 
     def __call__(self, environ, start_response):

@@ -18,7 +18,8 @@ def commands(name=None):
             ]
     for prefix, path in check:
         if not path.exists():
-            raise ValueError(f'{path.as_posix()} does not exist.')
+            #raise ValueError(f'{path.as_posix()} does not exist.')
+            continue
         for file in path.iterdir():
             if not file.is_file():
                 continue

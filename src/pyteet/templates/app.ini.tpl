@@ -3,6 +3,12 @@ name = My App
 env = production
 version = 1.0
 
+[cors]
+access_control_allow_origin = '*'
+#access_control_allow_methods = 'GET, POST, OPTIONS'
+#access_control_allow_headers = 'Content-Type, Authorization'
+#access_control_allow_credentials = False
+
 [database]
 default = database_sqlite
 
