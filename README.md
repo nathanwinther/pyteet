@@ -28,16 +28,22 @@ python3 -m pip install pyteet
 
 ## Commands
 
-View available commands
+**View available commands**
 
 ```console
 python3 -m pyteet
 ```
 
-Set up a new project
+**Set up a new project**
 
 ```console
 python3 -m pyteet init
+```
+
+Create `app.ini`
+
+```console
+cp app.ini.example app.ini
 ```
 
 Create your own commands
