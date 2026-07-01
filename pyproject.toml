@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "pyteet"
 dynamic = ["version"]
-description = ''
+description = 'Petite Python3 web framework.'
 readme = "README.md"
 requires-python = ">=3.8"
 license = "MIT"
@@ -24,7 +24,11 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
-dependencies = []
+dependencies = [
+  'Jinja2',
+  'Werkzeug',
+  'awsgi2',
+]
 
 [project.urls]
 Documentation = "https://github.com/nathanwinther/pyteet#readme"
