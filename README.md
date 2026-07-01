@@ -9,6 +9,7 @@
 
 - [About](#about)
 - [Installation](#installation)
+- [Commands](#commands)
 - [License](#license)
 
 ## About
@@ -22,7 +23,33 @@ web application framework. It is a simple wrapper around
 ## Installation
 
 ```console
-pip install pyteet
+python3 -m pip install pyteet
+```
+
+## Commands
+
+View available commands
+
+```console
+python3 -m pyteet
+```
+
+Set up a new project
+
+```console
+python3 -m pyteet init
+```
+
+Create your own commands
+
+```console
+python3 -m pyteet make command orders
+```
+
+And then run you command
+
+```console
+python3 -m pyteet orders
 ```
 
 ## License
