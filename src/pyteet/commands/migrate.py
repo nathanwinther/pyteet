@@ -25,11 +25,20 @@ def run(args):
             default=None,
             help='database connection',
             type=str)
+    parser.add_argument(
+            '-b',
+            '--batch',
+            default=None,
+            help='batch id for rollback',
+            type=int)
     parsed = parser.parse_args(args)
     module = importlib.import_module(__name__)
     task = getattr(module, f'_{parsed.task}', None)
     if task:
-        task(parsed.connection)
+        if task == 'rollback':
+            task(parsed.connection, parsed.batch)
+        else:
+            task(parsed.connection)
     else:
         print(f'{parsed.task} invalid task.')
         parser.print_help()
@@ -58,13 +67,14 @@ def _run(connection):
         db.execute(sql, (migration, max_batch + 1, dt, dt))
         print(f'{migration} migration complete')
 
-def _rollback(connection):
+def _rollback(connection, batch=None):
     state = _migrations(connection)
-    def _max_batch(acc, item):
-        batch = parseint(item.get('batch', ''))
-        return batch if batch > acc else acc
-    max_batch = reduce(_max_batch, state, 0)
-    if not max_batch:
+    if not batch:
+        def _max_batch(acc, item):
+            batch = parseint(item.get('batch', ''))
+            return batch if batch > acc else acc
+        batch = reduce(_max_batch, state, 0)
+    if not batch:
         return
     db = database(connection)
     sql = '''
@@ -73,7 +83,7 @@ def _rollback(connection):
         FROM pyteet_migrations
         WHERE batch = %s
     '''
-    rows = db.fetchall(sql, (max_batch, ))
+    rows = db.fetchall(sql, (batch, ))
     for row in rows:
         migration = row['migration']
         print(f'{migration} rollback started')
@@ -84,7 +94,7 @@ def _rollback(connection):
         DELETE FROM pyteet_migrations
         WHERE batch = %s
     '''
-    db.execute(sql, (max_batch, ))
+    db.execute(sql, (batch, ))
 
 def _status(connection):
     def print_sep(max_len):
@@ -111,12 +121,12 @@ def _status(connection):
     for k, v in enumerate(state):
         len_mgrtn = len(v['migration'])
         max_len[1] = len_mgrtn if len_mgrtn > max_len[1] else max_len[1]
-        len_batch = len(str(v['id']))
+        len_batch = len(str(v['batch']))
         max_len[2] = len_batch if len_batch > max_len[2] else max_len[2]
         state[k] = [
                 'Yes' if v['processed'] else 'No',
                 v['migration'],
-                str(v['id']),
+                str(v['batch']),
                 ]
     print_sep(max_len)
     print_row(header, max_len)
