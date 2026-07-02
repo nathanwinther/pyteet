@@ -30,6 +30,24 @@ def parseint(value):
     except:
         return 0
 
+def pluralize(word):
+    # Simle pluralize
+    # https://www.geeksforgeeks.org/python/python-program-to-convert-singular-to-plural/
+    # Check if word is ending with s,x,z or is
+    # ending with ah, eh, ih, oh,uh,dh,gh,kh,ph,rh,sh,th
+    word = str(word).strip()
+    if re.search(r'[sxz]$', word) or re.search(r'[aeioudgkprst]h$', word):
+        # Make it plural by adding es in end
+        return word + 'es'
+    # Check if word is ending with y
+    elif re.search(r'y$', word):
+        # Make it plural by removing y from end adding ies to end
+        return re.sub(r'y$', 'ies', word)
+    # In all the other cases
+    else:
+        # Make the plural of word by adding s in end
+        return word + 's'
+
 def render_template(template_name, **context):
     template_path = Path(__file__).resolve().parent / 'templates'
     env = Environment(

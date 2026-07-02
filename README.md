@@ -1,6 +1,6 @@
-# pyteet
+# Pyteet
 
-Pyteet is a lightweight [WSGI](https://wsgi.readthedocs.io/)
+A petite [WSGI](https://wsgi.readthedocs.io/)
 web application framework. It is a simple wrapper around 
 [Werkzeug](https://werkzeug.palletsprojects.com/) and 
 [Jinja](https://jinja.palletsprojects.com/) inspired by

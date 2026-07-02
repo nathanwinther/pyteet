@@ -1,4 +1,4 @@
-from pyteet import camel_to_snake, render_template
+from pyteet import camel_to_snake, pluralize, render_template
 
 import argparse
 import importlib
@@ -60,8 +60,9 @@ def _migration(name):
 
 def _model(name):
     proj_root = Path().cwd()
-    table = camel_to_snake(name)
-    path = proj_root / 'models' / f'{table}.py'
+    file = camel_to_snake(name)
+    table = pluralize(file)
+    path = proj_root / 'models' / f'{file}.py'
     with open(path.as_posix(), 'w') as w:
         w.write(render_template('model.py.tpl', name=name, table=table))
     print(f'created: {path.as_posix()}')
