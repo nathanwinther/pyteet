@@ -28,5 +28,6 @@ from .routing import \
         Route, \
         Router
 from .model import Model
+from .migrations import migrations
 from .validator import Validator
 
