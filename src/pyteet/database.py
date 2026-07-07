@@ -1,14 +1,17 @@
-from pyteet import config, Log, parsebool, parseint
-
 import copy
 import re
 import threading
+from pathlib import Path
 
-DATETIME_DB = '%Y-%m-%d %H:%M:%S'
+from .log import Log
+from .config import config
+from .util import parsebool, parseint
+
+DATETIME = '%Y-%m-%d %H:%M:%S'
 
 _conn_pool = {}
 
-def database(name=None):
+def database(name:str | None = None) -> DBWrap:
     if not name:
         name = config('database.default')
         if not name:
@@ -19,6 +22,10 @@ def database(name=None):
     if not 'driver' in conn_info:
         raise ValueError(f'{name} does not define driver.')
     driver = conn_info['driver']
+    if driver == 'mysql':
+        return DBWrapMysql(name, driver, conn_info)
+    if driver == 'postgres':
+        return DBWrapPostgres(name, driver, conn_info)
     if driver == 'sqlite':
         return DBWrapSqlite(name, driver, conn_info)
     raise ValueError(f'{driver} driver not supported.')
@@ -41,12 +48,12 @@ def database_release():
 
 class DBWrap:
 
-    def __init__(self, name, driver, conn_info):
+    def __init__(self, name: str, driver: str, conn_info: dict):
         self.name = name
         self.driver = driver
         self.conn_info = conn_info
 
-    def _fmt_sql(self, sql):
+    def _fmt_sql(self, sql: str) -> str:
         sql = re.sub(r'\s\s*', ' ', sql)
         return sql.strip().strip(';')
 
@@ -87,14 +94,14 @@ class DBWrapMysql(DBWrap):
             path = Path().cwd() / self.conn_info['ssl_ca']
             if path.exists():
                 params['ssl_ca'] = path.as_posix()
-        if 'ssl_verify_identity' in self.conn_info['ssl_verify_identity']:
+        if 'ssl_verify_identity' in self.conn_info:
             params['ssl_verify_identity'] = parsebool(
                     self.conn_info['ssl_verify_identity'])
         conn = mysql.connector.connect(**params)
         self._pool_add(conn)
         return conn
 
-    def execute(self, sql, bind=None):
+    def execute(self, sql: str, bind: tuple | None = None):
         try:
             conn = self.connect()
             with conn.cursor(**self.cursor_args) as cursor:
@@ -105,7 +112,7 @@ class DBWrapMysql(DBWrap):
             Log.error(error=e, sql=sql, bind=bind)
             raise e
 
-    def fetchall(self, sql, bind=None):
+    def fetchall(self, sql: str, bind: tuple | None = None) -> dict:
         try:
             conn = self.connect()
             with conn.cursor(**self.cursor_args) as cursor:
@@ -117,7 +124,7 @@ class DBWrapMysql(DBWrap):
             Log.error(error=e, sql=sql, bind=bind)
             raise e
 
-    def fetchone(self, sql, bind=None):
+    def fetchone(self, sql: str, bind: tuple | None = None) -> list:
         try:
             conn = self.connect()
             with conn.cursor(**self.cursor_args) as cursor:
@@ -129,7 +136,7 @@ class DBWrapMysql(DBWrap):
             Log.error(error=e, sql=sql, bind=bind)
             raise e
 
-    def insert(self, sql, bind=None):
+    def insert(self, sql: str, bind: tuple) -> int:
         try:
             conn = self.connect()
             with conn.cursor(**self.cursor_args) as cursor:
@@ -167,7 +174,7 @@ class DBWrapPostgres(DBWrap):
         self._pool_add(conn)
         return conn
 
-    def execute(self, sql, bind=None):
+    def execute(self, sql: str, bind: tuple | None = None):
         try:
             conn = self.connect()
             with conn.cursor(**self.cursor_args) as cursor:
@@ -178,7 +185,7 @@ class DBWrapPostgres(DBWrap):
             Log.error(error=e, sql=sql, bind=bind)
             raise e
 
-    def fetchall(self, sql, bind=None):
+    def fetchall(self, sql: str, bind: tuple | None = None) -> dict:
         try:
             conn = self.connect()
             with conn.cursor(**self.cursor_args) as cursor:
@@ -190,7 +197,7 @@ class DBWrapPostgres(DBWrap):
             Log.error(error=e, sql=sql, bind=bind)
             raise e
 
-    def fetchone(self, sql, bind=None):
+    def fetchone(self, sql: str, bind: tuple | None = None) -> list:
         try:
             conn = self.connect()
             with conn.cursor(**self.cursor_args) as cursor:
@@ -202,7 +209,7 @@ class DBWrapPostgres(DBWrap):
             Log.error(error=e, sql=sql, bind=bind)
             raise e
 
-    def insert(self, sql, bind=None):
+    def insert(self, sql: str, bind: tuple) -> int:
         try:
             conn = self.connect()
             with conn.cursor(**self.cursor_args) as cursor:
@@ -228,7 +235,7 @@ class DBWrapSqlite(DBWrap):
         conn.row_factory = sqlite3.Row
         return conn
 
-    def execute(self, sql, bind=None):
+    def execute(self, sql: str, bind: tuple | None = None):
         try:
             with self.connect() as conn:
                 cursor = conn.cursor()
@@ -240,7 +247,7 @@ class DBWrapSqlite(DBWrap):
             Log.error(error=e, sql=sql, bind=bind)
             raise e
 
-    def fetchall(self, sql, bind=None):
+    def fetchall(self, sql: str, bind: tuple | None = None) -> dict:
         try:
             with self.connect() as conn:
                 cursor = conn.cursor()
@@ -255,7 +262,7 @@ class DBWrapSqlite(DBWrap):
             Log.error(error=e, sql=sql, bind=bind)
             raise e
 
-    def fetchone(self, sql, bind=None):
+    def fetchone(self, sql: str, bind: tuple | None = None) -> list:
         try:
             with self.connect() as conn:
                 cursor = conn.cursor()
@@ -269,7 +276,7 @@ class DBWrapSqlite(DBWrap):
             Log.error(error=e, sql=sql, bind=bind)
             raise e
 
-    def insert(self, sql, bind=None):
+    def insert(self, sql: str, bind: tuple) -> int:
         try:
             with self.connect() as conn:
                 cursor = conn.cursor()

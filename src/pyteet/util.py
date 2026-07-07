@@ -56,6 +56,15 @@ def render_template(template_name, **context):
     t = env.get_template(template_name)
     return t.render(context)
 
+def send_error(message=None, status=400, field_errors=None):
+    message = message if message else 'Oops! That\'s an error'
+    payload = {'success': False, 'message': message}
+    if field_errors:
+        payload['errors'] = field_errors
+    else:
+        payload['errors'] = []
+    return send_json(payload, status)
+
 def send_json(data, status=200):
     return Response(
             json.dumps(data),

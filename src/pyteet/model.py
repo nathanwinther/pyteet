@@ -1,7 +1,7 @@
-from pyteet import DATETIME_DB, database
-
 import copy
 from datetime import datetime, UTC
+
+from .database import database, DATETIME
 
 class Model:
 
@@ -44,12 +44,15 @@ class Model:
             super().__setattr__(name, value)
         else:
             # Map to Model data
+            if self._data.get(name, None) == value:
+                # No change
+                return
             self._data[name] = value
             if not name in self._dirty:
                 # Mark as dirty
                 self._dirty.append(name)
 
-    def copy(self):
+    def copy(self) -> dict:
         return copy.deepcopy(self._data)
 
     def creating(self):
@@ -71,7 +74,7 @@ class Model:
         inst._data = data
         return inst
 
-    def fetchall(self, sql, bind=None):
+    def fetchall(self, sql: str, bind: tuple | None = None) -> list:
         rows = database(self.CONNECTION).fetchall(sql, bind)
         if not rows:
             return []
@@ -81,7 +84,7 @@ class Model:
             rows[k] = inst
         return rows
 
-    def fetchone(self, sql, bind=None):
+    def fetchone(self, sql: str, bind: tuple | None = None) -> Model:
         data = database(self.CONNECTION).fetchone(sql, bind)
         if not data:
             return None
@@ -101,7 +104,7 @@ class Model:
                 data[k] = Model.for_api(self, v, True)
             return data
         if isinstance(data, datetime):
-            return data.strftime(DATETIME_DB)
+            return data.strftime(DATETIME)
         if isinstance(data, Model):
             return data.for_api()
         return data
@@ -111,7 +114,7 @@ class Model:
             # Nothing to save
             return
         pk = getattr(self, self.PRIMARY_KEY)
-        dt = datetime.now(UTC).strftime(DATETIME_DB)
+        dt = datetime.now(UTC).strftime(DATETIME)
         db = database(self.CONNECTION)
         is_insert = pk == None
         if is_insert:

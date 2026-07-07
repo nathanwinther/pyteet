@@ -1,7 +1,6 @@
 from pyteet import camel_to_snake, pluralize, render_template
 
 import argparse
-import importlib
 from datetime import datetime, UTC
 from pathlib import Path
 
@@ -21,9 +20,8 @@ def run(args):
             help='resource name',
             type=str)
     parsed = parser.parse_args(args)
-    module = importlib.import_module(__name__)
-    task = getattr(module, f'_{parsed.resource}', None)
-    if task:
+    task = globals().get(f'_{parsed.resource}')
+    if task and callable(task):
         task(parsed.name)
     else:
         print(f'{parsed.resource} invalid resource.')

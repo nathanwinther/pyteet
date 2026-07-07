@@ -1,8 +1,9 @@
-from pyteet import database, Log
-
 import importlib
 from operator import itemgetter
 from pathlib import Path
+
+from .log import Log
+from .database import database
 
 def migrations(connection=None):
     def find(state, migration):

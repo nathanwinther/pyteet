@@ -1,4 +1,4 @@
-from pyteet import DATETIME_DB, database, migrations, parseint, Log
+from pyteet import DATETIME, database, migrations, parseint, Log
 
 import argparse
 import importlib
@@ -29,10 +29,9 @@ def run(args):
             help='batch id for rollback',
             type=int)
     parsed = parser.parse_args(args)
-    module = importlib.import_module(__name__)
-    task = getattr(module, f'_{parsed.task}', None)
-    if task:
-        if task == 'rollback':
+    task = globals().get(f'_{parsed.task}')
+    if task and callable(task):
+        if parsed.task == 'rollback':
             task(parsed.connection, parsed.batch)
         else:
             task(parsed.connection)
@@ -46,7 +45,7 @@ def _run(connection):
     if not unprocessed:
         return
     db = database(connection)
-    dt = datetime.now(UTC).strftime(DATETIME_DB)
+    dt = datetime.now(UTC).strftime(DATETIME)
     def _max_batch(acc, item):
         batch = parseint(item.get('batch', ''))
         return batch if batch > acc else acc
@@ -113,8 +112,6 @@ def _status(connection):
             row[2].ljust(max_len[2]),
             ' |'))
     state = migrations(connection)
-    for v in state:
-        print(v)
     header = ['Ran?', 'Migration', 'Batch']
     max_len = [len(x) for x in header]
     for k, v in enumerate(state):

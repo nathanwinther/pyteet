@@ -54,7 +54,7 @@ if __name__ == '__main__':
             except Exception as e:
                 raise e
             finally:
-                Log.debug('command cleanup')
+                Log.debug('teardown_command')
                 database_close()
         else:
             raise ValueError(f'{sys.argv[1]} command not found.')

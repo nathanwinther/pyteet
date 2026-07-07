@@ -25,9 +25,10 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-  'Jinja2',
-  'Werkzeug',
+  'Flask',
   'awsgi2',
+  'email_validator',
+  'flask-cors',
 ]
 
 [project.urls]

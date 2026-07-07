@@ -1,9 +1,12 @@
 # Pyteet
 
 A petite [WSGI](https://wsgi.readthedocs.io/)
-web application framework. It is a simple wrapper around 
+web application framework. 
+Use with [Flask](https://flask.palletsprojects.com/en/stable/),
+a simple wrapper around 
 [Werkzeug](https://werkzeug.palletsprojects.com/) and 
-[Jinja](https://jinja.palletsprojects.com/) inspired by
+[Jinja](https://jinja.palletsprojects.com/).
+Inspired by
 [Laravel](https://laravel.com).
 
 ## Table of Contents
@@ -15,6 +18,8 @@ web application framework. It is a simple wrapper around
 ## Installation
 
 ```console
+python3 -m venv .venv
+source .venv/bin/activate
 python3 -m pip install pyteet
 ```
 

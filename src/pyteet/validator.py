@@ -1,6 +1,7 @@
 import re
-from email_validator import validate_email, EmailNotValidError
-from pyteet import pluralize
+from email_validator import validate_email
+
+from .util import pluralize
 
 class Validator:
 
@@ -12,7 +13,7 @@ class Validator:
 
     _rules = {}
 
-    def add_rule(self, name, func, **kwargs):
+    def add(self, name, func, **kwargs):
         if not name in self._rules:
             self._rules[name] = []
         self._rules[name].append(self.ValidatorRule(func, **kwargs))

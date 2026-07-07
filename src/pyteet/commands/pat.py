@@ -5,7 +5,7 @@ from datetime import datetime, UTC
 from pathlib import Path
 
 NAME = 'pat'
-DESC = 'Install Personal Access Token migration and model'
+DESC = 'Install Personal Access Token migration'
 
 def run(args):
     parser = argparse.ArgumentParser(
@@ -29,20 +29,15 @@ def run(args):
         if installed:
             print('installed:', installed)
             return
-        # Install
+        # Install migration
         proj_root = Path().cwd()
-        # Migration
         prefix = datetime.now(UTC).strftime('%Y%m%d%H%M%S')
         suffix = 'create_pyteet_pat'
         path = proj_root / 'migrations' / f'{prefix}_{suffix}.py'
         with open(path.as_posix(), 'w') as w:
-            w.write(render_template(f'{suffix}.py.tpl', prefix=prefix))
-        print(f'created: {path.as_posix()}')
-        # Model
-        name = 'personal_access_token'
-        path = proj_root / 'models' / f'{name}.py'
-        with open(path.as_posix(), 'w') as w:
-            w.write(render_template(f'{name}.py.tpl'))
+            w.write(render_template(
+                'migration_create_pyteet_pat.py.tpl',
+                prefix=prefix))
         print(f'created: {path.as_posix()}')
     else:
         parser.print_help()

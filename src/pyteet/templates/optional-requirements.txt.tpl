@@ -1,0 +1,3 @@
+# mysql-connector-python # Optional MySQL
+# psycopg[binary]        # Optional PostgreSQL
+

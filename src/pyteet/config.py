@@ -1,11 +1,11 @@
-from pyteet import Log
-
 import configparser
 from pathlib import Path
 
+from .log import Log
+
 _config = {}
 
-def config(name=None, default=None):
+def config(name: str | None = None, default: any | None = None) -> str:
     def load_config():
         Log.debug(message='load config')
         path = Path().cwd() / 'app.ini'
