@@ -11,7 +11,8 @@ class Validator:
             self.func = func
             self.kwargs = kwargs
 
-    _rules = {}
+    def __init__(self):
+        self._rules = {}
 
     def add(self, name, func, **kwargs):
         if not name in self._rules:
@@ -25,8 +26,8 @@ class Validator:
             value = data.get(name, '')
             for rule in rules:
                 args = [name, value]
-                ok, message = rule.func(*args, **rule.kwargs)
-                if not ok:
+                _ok, message = rule.func(*args, **rule.kwargs)
+                if not _ok:
                     ok = False
                     errors[name] = [message]
                     break
