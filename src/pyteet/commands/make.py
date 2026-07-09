@@ -6,25 +6,35 @@ from pathlib import Path
 
 NAME = 'make'
 DESC = 'Create a new resource'
+LONG_DESC = '''Create a new resource
+
+Commands
+
+command    [name] module name Ex. process_orders
+controller [name] module name Ex. orders
+migration  [name] module name Ex. create_orders
+model      [name] class name  Ex. OrderDetail
+'''
 
 def run(args):
     parser = argparse.ArgumentParser(
-            description=DESC,
+            description=LONG_DESC,
+            exit_on_error=False,
+            formatter_class=argparse.RawTextHelpFormatter,
             usage=NAME)
     parser.add_argument(
-            'resource',
-            help='command, controller, migration, model',
+            'command',
+            help='command',
             type=str)
     parser.add_argument(
             'name',
             help='resource name',
             type=str)
-    parsed = parser.parse_args(args)
-    task = globals().get(f'_{parsed.resource}')
-    if task and callable(task):
-        task(parsed.name)
-    else:
-        print(f'{parsed.resource} invalid resource.')
+    try:
+        parsed = parser.parse_args(args)
+        command = globals().get(f'_{parsed.command}')
+        command(parsed.name)
+    except:
         parser.print_help()
 
 def _command(name):

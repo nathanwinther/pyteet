@@ -6,15 +6,25 @@ from datetime import datetime, UTC
 from functools import reduce
 
 NAME = 'migrate'
-DESC = 'Database migration tasks'
+DESC = 'Database migration commands'
+LONG_DESC = '''Database migration commands
+
+Commands
+
+run                        Run migrations
+rollback --batch [batchid] Rollback batch
+status                     View migrations status
+'''
 
 def run(args):
     parser = argparse.ArgumentParser(
-            description=DESC,
+            description=LONG_DESC,
+            exit_on_error=False,
+            formatter_class=argparse.RawTextHelpFormatter,
             usage=NAME)
     parser.add_argument(
-            'task',
-            help='run, rollback, status',
+            'command',
+            help='command',
             type=str)
     parser.add_argument(
             '-c',
@@ -28,15 +38,14 @@ def run(args):
             default=None,
             help='batch id for rollback',
             type=int)
-    parsed = parser.parse_args(args)
-    task = globals().get(f'_{parsed.task}')
-    if task and callable(task):
-        if parsed.task == 'rollback':
-            task(parsed.connection, parsed.batch)
+    try:
+        parsed = parser.parse_args(args)
+        command = globals().get(f'_{parsed.command}')
+        if parsed.command == 'rollback':
+            command(parsed.connection, parsed.batch)
         else:
-            task(parsed.connection)
-    else:
-        print(f'{parsed.task} invalid task.')
+            command(parsed.connection)
+    except:
         parser.print_help()
 
 def _run(connection):
