@@ -22,6 +22,7 @@ from .database import \
         database_release
 from .model import Model
 from .personal_access_token import PersonalAccessToken
+from .mail import send_mail
 from .migrations import migrations
 from .validator import Validator
 
