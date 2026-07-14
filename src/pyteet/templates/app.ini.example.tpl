@@ -41,3 +41,12 @@ driver = sqlite
 database = app.db
 autocommit = True
 
+[mail]
+host = [smtp.example.com]
+port = 587
+startssl = True
+username = [username]
+password = [password]
+default_sender_name = 'Hello'
+default_sender_addr = hello@example.com
+

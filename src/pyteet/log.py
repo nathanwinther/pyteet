@@ -7,6 +7,16 @@ class Log:
     levels = ['SQL', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL']
 
     @staticmethod
+    def allow(level: str) -> bool:
+        if not level in Log.levels:
+            return False
+        if not PYTEET_LOG_LEVEL in Log.levels:
+            return False
+        if Log.levels.index(PYTEET_LOG_LEVEL) > Log.levels.index(level):
+            return False
+        return True
+
+    @staticmethod
     def debug(message: str | None = None, **kwargs):
         if message:
             kwargs = {'message': message} | kwargs
@@ -38,11 +48,7 @@ class Log:
 
     @staticmethod
     def log(level: str, **kwargs):
-        if not level in Log.levels:
-            return
-        if not PYTEET_LOG_LEVEL in Log.levels:
-            return
-        if Log.levels.index(PYTEET_LOG_LEVEL) > Log.levels.index(level):
+        if not Log.allow(level):
             return
         data = {'level': level} | kwargs
         print(data)

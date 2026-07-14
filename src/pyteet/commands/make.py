@@ -1,4 +1,5 @@
-from pyteet import camel_to_snake, pluralize, render_template
+from pyteet import camel_to_snake, pluralize
+from pyteet.util import render_pyteet_template
 
 import argparse
 from datetime import datetime, UTC
@@ -34,6 +35,8 @@ def run(args):
         parsed = parser.parse_args(args)
         command = globals().get(f'_{parsed.command}')
         command(parsed.name)
+    except ValueError as e:
+        print(e)
     except:
         parser.print_help()
 
@@ -44,7 +47,7 @@ def _command(name):
     if path.exists():
         raise ValueError(f'{path} already exists.')
     with open(path.as_posix(), 'w') as w:
-        w.write(render_template('command.py.tpl', name=name))
+        w.write(render_pyteet_template('command.py.tpl', name=name))
     print(f'created: {path.as_posix()}')
 
 def _controller(name):
@@ -54,7 +57,7 @@ def _controller(name):
     if path.exists():
         raise ValueError(f'{path} already exists.')
     with open(path.as_posix(), 'w') as w:
-        w.write(render_template('controller.py.tpl'))
+        w.write(render_pyteet_template('controller.py.tpl'))
     print(f'created: {path.as_posix()}')
 
 def _migration(name):
@@ -63,7 +66,7 @@ def _migration(name):
     name = f'{prefix}_{camel_to_snake(name)}'
     path = proj_root / 'migrations' / f'{name}.py'
     with open(path.as_posix(), 'w') as w:
-        w.write(render_template('migration.py.tpl', name=name))
+        w.write(render_pyteet_template('migration.py.tpl', name=name))
     print(f'created: {path.as_posix()}')
 
 def _model(name):
@@ -72,6 +75,6 @@ def _model(name):
     table = pluralize(file)
     path = proj_root / 'models' / f'{file}.py'
     with open(path.as_posix(), 'w') as w:
-        w.write(render_template('model.py.tpl', name=name, table=table))
+        w.write(render_pyteet_template('model.py.tpl', name=name, table=table))
     print(f'created: {path.as_posix()}')
 

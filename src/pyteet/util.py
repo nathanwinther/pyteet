@@ -48,8 +48,16 @@ def pluralize(word):
         # Make the plural of word by adding s in end
         return word + 's'
 
-def render_template(template_name, **context):
+def render_pyteet_template(template_name, **context):
     template_path = Path(__file__).resolve().parent / 'templates'
+    env = Environment(
+            loader=FileSystemLoader(template_path),
+            autoescape=True)
+    t = env.get_template(template_name)
+    return t.render(context)
+
+def render_template(template_name, **context):
+    template_path = Path().cwd() / 'templates'
     env = Environment(
             loader=FileSystemLoader(template_path),
             autoescape=True)

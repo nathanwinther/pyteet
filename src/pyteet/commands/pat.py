@@ -1,4 +1,5 @@
-from pyteet import database, migrations, render_template
+from pyteet import database, migrations
+from pyteet.util import render_pyteet_template
 
 import argparse
 from datetime import datetime, UTC
@@ -41,7 +42,7 @@ def run(args):
         path = proj_root / 'migrations' / f'{prefix}_{suffix}.py'
         db = database(parsed.connection)
         with open(path.as_posix(), 'w') as w:
-            w.write(render_template(
+            w.write(render_pyteet_template(
                 f'migration_{db.driver}_create_pyteet_pat.py.tpl',
                 prefix=prefix))
         print(f'created: {path.as_posix()}')
