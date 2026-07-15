@@ -40,6 +40,7 @@ def run(args):
     except:
         parser.print_help()
 
+
 def _command(name):
     proj_root = Path().cwd()
     name = camel_to_snake(name)
@@ -49,6 +50,7 @@ def _command(name):
     with open(path.as_posix(), 'w') as w:
         w.write(render_pyteet_template('command.py.tpl', name=name))
     print(f'created: {path.as_posix()}')
+
 
 def _controller(name):
     proj_root = Path().cwd()
@@ -60,6 +62,7 @@ def _controller(name):
         w.write(render_pyteet_template('controller.py.tpl'))
     print(f'created: {path.as_posix()}')
 
+
 def _migration(name):
     proj_root = Path().cwd()
     prefix = datetime.now(UTC).strftime('%Y%m%d%H%M%S')
@@ -68,6 +71,7 @@ def _migration(name):
     with open(path.as_posix(), 'w') as w:
         w.write(render_pyteet_template('migration.py.tpl', name=name))
     print(f'created: {path.as_posix()}')
+
 
 def _model(name):
     proj_root = Path().cwd()

@@ -30,13 +30,16 @@ class Model:
         if not hasattr(cls, 'CONNECTION'):
             raise TypeError(f'{cls.__name__} must define attribute CONNECTION')
 
+
     def __init__(self):
         self._data = {}
         self._dirty = []
 
+
     def __getattr__(self, name):
         # Method missing hook
         return self._data.get(name)
+
 
     def __setattr__(self, name, value):
         if hasattr(type(self), name):
@@ -52,27 +55,30 @@ class Model:
                 # Mark as dirty
                 self._dirty.append(name)
 
+
     def copy(self) -> dict:
         return copy.deepcopy(self._data)
+
 
     def creating(self):
         '''Called on save() for INSERT.'''
         pass
 
+
     def find(self, id: int) -> Model:
-        sql = '''
+        sql = f'''
             SELECT
                 *
-            FROM {}
-            WHERE {} = %s
-        '''.format(self.TABLE,
-                   self.PRIMARY_KEY)
+            FROM {self.TABLE}
+            WHERE {self.PRIMARY_KEY} = %s
+        '''
         data = database(self.CONNECTION).fetchone(sql, (id, ))
         if not data:
             return None
         inst = self.__class__()
         inst._data = data
         return inst
+
 
     def fetchall(self, sql: str, bind: tuple | None = None) -> list:
         rows = database(self.CONNECTION).fetchall(sql, bind)
@@ -84,6 +90,7 @@ class Model:
             rows[k] = inst
         return rows
 
+
     def fetchone(self, sql: str, bind: tuple | None = None) -> Model:
         data = database(self.CONNECTION).fetchone(sql, bind)
         if not data:
@@ -91,6 +98,7 @@ class Model:
         inst = self.__class__()
         inst._data = data
         return inst
+
 
     def for_api(self, data=None, recurse=False):
         if not data and not recurse:
@@ -108,6 +116,7 @@ class Model:
         if isinstance(data, Model):
             return data.for_api()
         return data
+
 
     def save(self):
         if not self._dirty:
@@ -160,6 +169,7 @@ class Model:
             db.execute(sql, values)
             self._dirty = []
             return
+
 
     def saving(self):
         '''Called on save() for INSERT and UPDATE.'''

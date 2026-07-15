@@ -54,6 +54,7 @@ class PersonalAccessToken(Model):
             return auth_has_impl
         return auth_has_wrap
 
+
     @staticmethod
     def auth_user(request: Request, abilities: list | None=[]) -> Model:
         if not request.authorization:
@@ -81,8 +82,10 @@ class PersonalAccessToken(Model):
         except:
             return None
 
+
     def bearer(self) -> str:
         return f'{self.id}|{self.get_hash_token()}'
+
 
     @staticmethod
     def create(tokenable: Model, abilities: list) -> Model:
@@ -96,17 +99,21 @@ class PersonalAccessToken(Model):
         inst.save()
         return inst
 
+
     def get_hash_token(self) -> str:
         return hashlib.sha256(self.token.encode('utf-8')).hexdigest()
+
 
     def get_tokenable(self) -> Model:
         model = importlib.import_module(self.tokenable_module)
         class_object = getattr(model, self.tokenable_class)
         return class_object().find(self.tokenable_id)
         
+
     def has(self, ability: str) -> bool:
         inst_abilities = json.loads(self.abilities)
         return ability in inst_abilities
+
 
     def has_any(self, abilities: list) -> bool:
         inst_abilities = json.loads(self.abilities)

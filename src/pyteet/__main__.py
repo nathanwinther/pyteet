@@ -11,6 +11,7 @@ def commands(name=None):
             if not hasattr(module, k):
                 return False
         return True
+
     cache = {}
     check = [
             ('pyteet.commands', Path(__file__).resolve().parent / 'commands'),
@@ -20,22 +21,28 @@ def commands(name=None):
         if not path.exists():
             #raise ValueError(f'{path.as_posix()} does not exist.')
             continue
+
         for file in path.iterdir():
             if not file.is_file():
                 continue
             if file.suffix != '.py':
                 continue
+
             module_name = f'{prefix}.{file.stem}'
             module = importlib.import_module(module_name)
+
             if not validate(module):
                 continue
+
             Log.debug(f'pkg module found: {module_name}')
             cache[getattr(module, 'NAME')] = {
                     'NAME': getattr(module, 'NAME'),
                     'DESC': getattr(module, 'DESC'),
                     'module': module_name,
                     }
+
     return cache.get(name) if name else cache
+
 
 if __name__ == '__main__':
     argc = len(sys.argv)

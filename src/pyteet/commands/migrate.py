@@ -48,6 +48,7 @@ def run(args):
     except:
         parser.print_help()
 
+
 def _run(connection):
     state = migrations(connection)
     unprocessed = [item for item in state if item['processed'] == False]
@@ -71,6 +72,7 @@ def _run(connection):
         '''
         db.execute(sql, (migration, max_batch + 1, dt, dt))
         print(f'{migration} migration complete')
+
 
 def _rollback(connection, batch=None):
     state = migrations(connection)
@@ -100,6 +102,7 @@ def _rollback(connection, batch=None):
         WHERE batch = %s
     '''
     db.execute(sql, (batch, ))
+
 
 def _status(connection):
     def print_sep(max_len):

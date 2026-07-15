@@ -11,15 +11,18 @@ def migrations(connection=None):
             if item['migration'] == migration:
                 return idx
         return -1
+
     def validate(module):
         must_have = ('NAME', 'CONNECTION', 'migrate', 'rollback')
         for k in must_have:
             if not hasattr(module, k):
                 return False
         return True
+
     # Get migrations
     state = []
     db = database(connection)
+
     try:
         sql = '''
             SELECT
@@ -61,6 +64,7 @@ def migrations(connection=None):
                 )
             '''
         db.execute(sql)
+
     # Find migrations
     path = Path().cwd() / 'migrations'
     if path.exists():
@@ -85,6 +89,7 @@ def migrations(connection=None):
                     'processed': False,
                     'module': module_name,
                     })
+
     state = sorted(state, key=itemgetter('migration'))
     return state
 

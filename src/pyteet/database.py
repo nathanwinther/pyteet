@@ -16,11 +16,15 @@ def database(name:str | None = None) -> DBWrap:
         name = config('database.default')
         if not name:
             raise ValueError('database.default not defined.')
+
     conn_info = copy.deepcopy(config(name))
+
     if not conn_info:
         raise ValueError(f'{name} database not defined.')
+
     if not 'driver' in conn_info:
         raise ValueError(f'{name} does not define driver.')
+
     driver = conn_info['driver']
     if driver == 'mysql':
         return DBWrapMysql(name, driver, conn_info)
@@ -28,7 +32,9 @@ def database(name:str | None = None) -> DBWrap:
         return DBWrapPostgres(name, driver, conn_info)
     if driver == 'sqlite':
         return DBWrapSqlite(name, driver, conn_info)
+
     raise ValueError(f'{driver} driver not supported.')
+
 
 def database_close():
     match = f'{threading.get_ident()}:'
@@ -41,10 +47,12 @@ def database_close():
         except:
             Log.error(error=f'close database connection failed: {k}')
 
+
 def database_release():
     keys = [k for k in _conn_pool.keys()]
     for k in keys:
         del(_conn_pool[k])
+
 
 class DBWrap:
 
@@ -53,14 +61,17 @@ class DBWrap:
         self.driver = driver
         self.conn_info = conn_info
 
+
     def _fmt_sql(self, sql: str) -> str:
         sql = re.sub(r'\s\s*', ' ', sql)
         return sql.strip().strip(';')
+
 
     def _pool_add(self, conn):
         id = f'{threading.get_ident()}:{self.name}'
         Log.debug(f'Add connection to pool {id}:{conn}')
         _conn_pool[id] = conn
+
 
     def _pool_get(self):
         id = f'{threading.get_ident()}:{self.name}'
@@ -71,12 +82,16 @@ class DBWrap:
         return False
 
 class DBWrapMysql(DBWrap):
+
     def connect(self):
         import mysql.connector
         self.cursor_args = {'dictionary': True}
+
         conn = self._pool_get()
+
         if conn:
             return conn
+
         # Required
         params = {
                 'host': self.conn_info['host'],
@@ -85,21 +100,26 @@ class DBWrapMysql(DBWrap):
                 'username': self.conn_info['username'],
                 'password': self.conn_info['password'],
                 }
+
         # Optional
         if 'autocommit' in self.conn_info:
             params['autocommit'] = parsebool(self.conn_info['autocommit'])
         else:
             params['autocommit'] = True
+
         if 'ssl_ca' in self.conn_info:
             path = Path().cwd() / self.conn_info['ssl_ca']
             if path.exists():
                 params['ssl_ca'] = path.as_posix()
+
         if 'ssl_verify_identity' in self.conn_info:
             params['ssl_verify_identity'] = parsebool(
                     self.conn_info['ssl_verify_identity'])
+
         conn = mysql.connector.connect(**params)
         self._pool_add(conn)
         return conn
+
 
     def execute(self, sql: str, bind: tuple | None = None):
         try:
@@ -111,6 +131,7 @@ class DBWrapMysql(DBWrap):
         except Exception as e:
             Log.error(error=e, sql=sql, bind=bind)
             raise e
+
 
     def fetchall(self, sql: str, bind: tuple | None = None) -> dict:
         try:
@@ -124,6 +145,7 @@ class DBWrapMysql(DBWrap):
             Log.error(error=e, sql=sql, bind=bind)
             raise e
 
+
     def fetchone(self, sql: str, bind: tuple | None = None) -> list:
         try:
             conn = self.connect()
@@ -135,6 +157,7 @@ class DBWrapMysql(DBWrap):
         except Exception as e:
             Log.error(error=e, sql=sql, bind=bind)
             raise e
+
 
     def insert(self, sql: str, bind: tuple) -> int:
         try:
@@ -148,15 +171,19 @@ class DBWrapMysql(DBWrap):
             Log.error(error=e, sql=sql, bind=bind)
             raise e
 
+
 class DBWrapPostgres(DBWrap):
 
     def connect(self):
         import psycopg
         from psycopg.rows import dict_row
         self.cursor_args = {'row_factory': dict_row}
+
         conn = self._pool_get()
+
         if conn:
             return conn
+
         # Required
         params = {
                 'host': self.conn_info['host'],
@@ -165,14 +192,17 @@ class DBWrapPostgres(DBWrap):
                 'user': self.conn_info['username'],
                 'password': self.conn_info['password'],
                 }
+
         # Optional
         autocommit = True
         if 'autocommit' in self.conn_info:
             autocommit = parsebool(self.conn_info['autocommit'])
+
         conn_str = ' '.join([f'{k}={v}' for k, v in params.items()])
         conn = psycopg.connect(conn_str, autocommit=autocommit)
         self._pool_add(conn)
         return conn
+
 
     def execute(self, sql: str, bind: tuple | None = None):
         try:
@@ -184,6 +214,7 @@ class DBWrapPostgres(DBWrap):
         except Exception as e:
             Log.error(error=e, sql=sql, bind=bind)
             raise e
+
 
     def fetchall(self, sql: str, bind: tuple | None = None) -> dict:
         try:
@@ -197,6 +228,7 @@ class DBWrapPostgres(DBWrap):
             Log.error(error=e, sql=sql, bind=bind)
             raise e
 
+
     def fetchone(self, sql: str, bind: tuple | None = None) -> list:
         try:
             conn = self.connect()
@@ -208,6 +240,7 @@ class DBWrapPostgres(DBWrap):
         except Exception as e:
             Log.error(error=e, sql=sql, bind=bind)
             raise e
+
 
     def insert(self, sql: str, bind: tuple) -> int:
         try:
@@ -222,18 +255,22 @@ class DBWrapPostgres(DBWrap):
             Log.error(error=e, sql=sql, bind=bind)
             raise e
 
+
 class DBWrapSqlite(DBWrap):
 
     def connect(self):
         import sqlite3
+
         autocommit=True
         if 'autocommit' in self.conn_info:
             autocommit = parsebool(self.conn_info['autocommit'])
+
         conn = sqlite3.connect(
                 self.conn_info['database'], 
                 autocommit=autocommit)
         conn.row_factory = sqlite3.Row
         return conn
+
 
     def execute(self, sql: str, bind: tuple | None = None):
         try:
@@ -246,6 +283,7 @@ class DBWrapSqlite(DBWrap):
         except Exception as e:
             Log.error(error=e, sql=sql, bind=bind)
             raise e
+
 
     def fetchall(self, sql: str, bind: tuple | None = None) -> dict:
         try:
@@ -262,6 +300,7 @@ class DBWrapSqlite(DBWrap):
             Log.error(error=e, sql=sql, bind=bind)
             raise e
 
+
     def fetchone(self, sql: str, bind: tuple | None = None) -> list:
         try:
             with self.connect() as conn:
@@ -276,6 +315,7 @@ class DBWrapSqlite(DBWrap):
             Log.error(error=e, sql=sql, bind=bind)
             raise e
 
+
     def insert(self, sql: str, bind: tuple) -> int:
         try:
             with self.connect() as conn:
@@ -288,6 +328,7 @@ class DBWrapSqlite(DBWrap):
         except Exception as e:
             Log.error(error=e, sql=sql, bind=bind)
             raise e
+
 
     def _fmt_sql(self, sql: str) -> str:
         sql = re.sub('%s', '?', sql)

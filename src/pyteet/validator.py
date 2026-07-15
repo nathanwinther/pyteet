@@ -11,13 +11,16 @@ class Validator:
             self.func = func
             self.kwargs = kwargs
 
+
     def __init__(self):
         self._rules = {}
+
 
     def add(self, name, func, **kwargs):
         if not name in self._rules:
             self._rules[name] = []
         self._rules[name].append(self.ValidatorRule(func, **kwargs))
+
 
     def run(self, data):
         ok = True
@@ -33,6 +36,7 @@ class Validator:
                     break
         return ok, errors
 
+
     @staticmethod
     def email(name, value):
         try:
@@ -40,6 +44,7 @@ class Validator:
             return True, None
         except:
             return False, f'{name} must be a valid email address.'
+
 
     @staticmethod
     def length(name, value, min=None, max=None):
@@ -55,6 +60,7 @@ class Validator:
             else:
                 return False, f'{name} must have maximum {max} characters.'
         return True, None
+
         
     @staticmethod
     def numeric(name, value):
@@ -64,12 +70,14 @@ class Validator:
         except:
             return False, f'{name} must be numeric.'
 
+
     @staticmethod
     def regex(name, value, pattern=None):
         if re.search(pattern, str(value).strip()):
             return True, None
         else:
             return False, f'{name} is invalid.'
+
 
     @staticmethod
     def required(name, value):

@@ -16,11 +16,13 @@ class Log:
             return False
         return True
 
+
     @staticmethod
     def debug(message: str | None = None, **kwargs):
         if message:
             kwargs = {'message': message} | kwargs
         Log.log('DEBUG', **kwargs)
+
 
     @staticmethod
     def info(message: str | None = None, **kwargs):
@@ -28,11 +30,13 @@ class Log:
             kwargs = {'message': message} | kwargs
         Log.log('INFO', **kwargs)
 
+
     @staticmethod
     def warn(message: str | None = None, **kwargs):
         if message:
             kwargs = {'message': message} | kwargs
         Log.log('WARN', **kwargs)
+
 
     @staticmethod
     def error(message: str | None = None, **kwargs):
@@ -40,11 +44,13 @@ class Log:
             kwargs = {'message': message} | kwargs
         Log.log('ERROR', **kwargs)
 
+
     @staticmethod
     def fatal(message: str | None = None, **kwargs):
         if message:
             kwargs = {'message': message} | kwargs
         Log.log('FATAL', **kwargs)
+
 
     @staticmethod
     def log(level: str, **kwargs):
@@ -53,10 +59,10 @@ class Log:
         data = {'level': level} | kwargs
         print(data)
 
+
     @staticmethod
     def sql(message: str | None = None, **kwargs):
         if message:
             kwargs = {'message': message} | kwargs
         Log.log('SQL', **kwargs)
-
 

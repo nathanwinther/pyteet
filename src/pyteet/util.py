@@ -9,10 +9,12 @@ def camel_to_snake(value):
     value = re.sub(r'([a-z\d])([A-Z])', r'\1_\2', value)
     return value.lower()
 
+
 def parsebool(value):
     if isinstance(value, bool):
         return value
     return str(value).strip().lower() in ('true', 't', 'yes', 'y', '1')
+
 
 def parsefloat(value):
     if isinstance(value, float):
@@ -22,6 +24,7 @@ def parsefloat(value):
     except:
         return 0
 
+
 def parseint(value):
     if isinstance(value, int):
         return value
@@ -29,6 +32,7 @@ def parseint(value):
         return int(str(value).strip())
     except:
         return 0
+
 
 def pluralize(word):
     # Simle pluralize
@@ -48,6 +52,7 @@ def pluralize(word):
         # Make the plural of word by adding s in end
         return word + 's'
 
+
 def render_pyteet_template(template_name, **context):
     template_path = Path(__file__).resolve().parent / 'templates'
     env = Environment(
@@ -56,6 +61,7 @@ def render_pyteet_template(template_name, **context):
     t = env.get_template(template_name)
     return t.render(context)
 
+
 def render_template(template_name, **context):
     template_path = Path().cwd() / 'templates'
     env = Environment(
@@ -63,6 +69,7 @@ def render_template(template_name, **context):
             autoescape=True)
     t = env.get_template(template_name)
     return t.render(context)
+
 
 def send_error(message=None, status=400, field_errors=None):
     message = message if message else 'Oops! That\'s an error'
@@ -73,11 +80,13 @@ def send_error(message=None, status=400, field_errors=None):
         payload['errors'] = []
     return send_json(payload, status)
 
+
 def send_json(data, status=200):
     return Response(
             json.dumps(data),
             mimetype='application/json',
             status=status)
+
 
 def send_success(data=None, message='OK', meta=None):
     message = message if message else 'OK'

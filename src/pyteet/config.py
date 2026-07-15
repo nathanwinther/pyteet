@@ -18,16 +18,22 @@ def config(name: str | None = None, default: any | None = None) -> str:
                 _config[section] = {}
             for k, v in cfg[section].items():
                 _config[section][k] = v
+
     if not _config:
         load_config()
+
     if not name:
         return _config
+
     parts = name.split('.')
     section = parts.pop(0)
     key = '.'.join(parts)
+
     if not section in _config:
         return default
+
     if key:
         return _config[section].get(key, default)
+
     return _config[section]
 
