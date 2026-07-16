@@ -6,6 +6,7 @@
 from .log import Log
 from .util import (
         camel_to_snake,
+        jsonify,
         parsebool,
         parsefloat,
         parseint,

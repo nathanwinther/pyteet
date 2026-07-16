@@ -2,6 +2,7 @@ import copy
 from datetime import datetime, UTC
 
 from .database import database, DATETIME
+from .util import jsonify
 
 class Model:
 
@@ -103,19 +104,7 @@ class Model:
     def for_api(self, data=None, recurse=False):
         if not data and not recurse:
             data = self.copy()
-        if isinstance(data, dict):
-            for k, v in data.items():
-                data[k] = Model.for_api(self, v, True)
-            return data
-        if isinstance(data, list):
-            for k, v in enumerate(data):
-                data[k] = Model.for_api(self, v, True)
-            return data
-        if isinstance(data, datetime):
-            return data.strftime(DATETIME)
-        if isinstance(data, Model):
-            return data.for_api()
-        return data
+        return jsonify(data)
 
 
     def save(self):

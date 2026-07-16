@@ -1,5 +1,6 @@
 import json
 import re
+from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
 from pathlib import Path
 from werkzeug.wrappers import Response
@@ -9,6 +10,23 @@ def camel_to_snake(value):
     value = re.sub(r'([a-z\d])([A-Z])', r'\1_\2', value)
     return value.lower()
 
+
+def jsonify(data):
+    if isinstance(data, dict):
+        for k, v in data.items():
+            data[k] = jsonify(v)
+        return data
+    if isinstance(data, list):
+        for k, v in enumerate(data):
+            data[k] = jsonify(v)
+        return data
+    if isinstance(data, datetime):
+        return data.strftime(DATETIME)
+    if hasattr(data, 'for_api'):
+        f = getattr(data, 'for_api')
+        if callable(f):
+            return f(data)
+    return data
 
 def parsebool(value):
     if isinstance(value, bool):
