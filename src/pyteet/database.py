@@ -3,11 +3,10 @@ import re
 import threading
 from pathlib import Path
 
-from .log import Log
 from .config import config
+from .constants import DATETIME
+from .log import Log
 from .util import parsebool, parseint
-
-DATETIME = '%Y-%m-%d %H:%M:%S'
 
 _conn_pool = {}
 

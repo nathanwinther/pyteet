@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 # Import order IMPORTANT
+from .constants import DATETIME
 from .log import Log
 from .util import (
         camel_to_snake,
@@ -18,7 +19,6 @@ from .util import (
         )
 from .config import config
 from .database import (
-        DATETIME,
         database,
         database_close,
         database_release,

@@ -1,7 +1,8 @@
 import copy
 from datetime import datetime, UTC
 
-from .database import database, DATETIME
+from .constants import DATETIME
+from .database import database
 from .util import jsonify
 
 class Model:

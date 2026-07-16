@@ -5,6 +5,8 @@ from jinja2 import Environment, FileSystemLoader
 from pathlib import Path
 from werkzeug.wrappers import Response
 
+from .constants import DATETIME
+
 def camel_to_snake(value):
     value = re.sub(r'([A-Z]+)([A-Z][a-z])', r'\1_\2', value)
     value = re.sub(r'([a-z\d])([A-Z])', r'\1_\2', value)
