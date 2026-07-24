@@ -27,7 +27,7 @@ def jsonify(data):
     if hasattr(data, 'for_api'):
         f = getattr(data, 'for_api')
         if callable(f):
-            return f(data)
+            return f()
     return data
 
 def parsebool(value):
