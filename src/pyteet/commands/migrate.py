@@ -41,11 +41,15 @@ def run(args):
     try:
         parsed = parser.parse_args(args)
         command = globals().get(f'_{parsed.command}')
-        if parsed.command == 'rollback':
-            command(parsed.connection, parsed.batch)
+        if command:
+            if parsed.command == 'rollback':
+                command(parsed.connection, parsed.batch)
+            else:
+                command(parsed.connection)
         else:
-            command(parsed.connection)
-    except:
+            print('Invalid command')
+            parser.print_help()
+    except argparse.ArgumentError:
         parser.print_help()
 
 

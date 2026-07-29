@@ -34,10 +34,12 @@ def run(args):
     try:
         parsed = parser.parse_args(args)
         command = globals().get(f'_{parsed.command}')
-        command(parsed.name)
-    except ValueError as e:
-        print(e)
-    except:
+        if command:
+            command(parsed.name)
+        else:
+            print('Invalid command')
+            parser.print_help()
+    except argparse.ArgumentError:
         parser.print_help()
 
 

@@ -29,7 +29,6 @@ def run(args):
         installed = False
         for item in state:
             if item['migration'].endswith('_create_pyteet_pat'):
-                print('hit:', item['migration'])
                 installed = True
                 break
         if installed:
