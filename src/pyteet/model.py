@@ -67,6 +67,9 @@ class Model:
         pass
 
 
+    def fill(self, data: dict):
+        self._data = copy.deepcopy(data)
+
     def find(self, id: int) -> Model:
         sql = f'''
             SELECT
