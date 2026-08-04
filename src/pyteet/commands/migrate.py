@@ -11,7 +11,7 @@ LONG_DESC = '''Database migration commands
 
 Commands
 
-run                        Run migrations
+apply                      Apply migrations
 rollback --batch [batchid] Rollback batch
 status                     View migrations status
 '''
@@ -40,7 +40,7 @@ def run(args):
             type=int)
     try:
         parsed = parser.parse_args(args)
-        command = globals().get(f'_{parsed.command}')
+        command = globals().get(parsed.command)
         if command:
             if parsed.command == 'rollback':
                 command(parsed.connection, parsed.batch)
@@ -53,7 +53,7 @@ def run(args):
         parser.print_help()
 
 
-def _run(connection):
+def apply(connection):
     state = migrations(connection)
     unprocessed = [item for item in state if item['processed'] == False]
     if not unprocessed:
@@ -78,7 +78,7 @@ def _run(connection):
         print(f'{migration} migration complete')
 
 
-def _rollback(connection, batch=None):
+def rollback(connection, batch=None):
     state = migrations(connection)
     if not batch:
         def _max_batch(acc, item):
@@ -108,7 +108,7 @@ def _rollback(connection, batch=None):
     db.execute(sql, (batch, ))
 
 
-def _status(connection):
+def status(connection):
     def print_sep(max_len):
         print('{}{}{}{}{}{}{}'.format(
             '+-',

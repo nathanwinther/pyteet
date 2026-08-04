@@ -33,7 +33,7 @@ def run(args):
             type=str)
     try:
         parsed = parser.parse_args(args)
-        command = globals().get(f'_{parsed.command}')
+        command = globals().get(parsed.command)
         if command:
             command(parsed.name)
         else:
@@ -43,7 +43,7 @@ def run(args):
         parser.print_help()
 
 
-def _command(name):
+def command(name):
     proj_root = Path().cwd()
     name = camel_to_snake(name)
     path = proj_root / 'commands' / f'{name}.py'
@@ -54,7 +54,7 @@ def _command(name):
     print(f'created: {path.as_posix()}')
 
 
-def _controller(name):
+def controller(name):
     proj_root = Path().cwd()
     name = camel_to_snake(name)
     path = proj_root / 'controllers' / f'{name}.py'
@@ -65,7 +65,7 @@ def _controller(name):
     print(f'created: {path.as_posix()}')
 
 
-def _migration(name):
+def migration(name):
     proj_root = Path().cwd()
     prefix = datetime.now(UTC).strftime('%Y%m%d%H%M%S')
     name = f'{prefix}_{camel_to_snake(name)}'
@@ -75,7 +75,7 @@ def _migration(name):
     print(f'created: {path.as_posix()}')
 
 
-def _model(name):
+def model(name):
     proj_root = Path().cwd()
     file = camel_to_snake(name)
     table = pluralize(file)
