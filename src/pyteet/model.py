@@ -18,6 +18,8 @@ class Model:
     _data = {}
     # Model data that has been modified and unsaved
     _dirty = []
+    # Model data NOT for DB mapping
+    extra = {}
 
     def __init_subclass__(cls):
         super().__init_subclass__()
@@ -36,6 +38,7 @@ class Model:
     def __init__(self):
         self._data = {}
         self._dirty = []
+        self.extra = {}
 
 
     def __getattr__(self, name):
@@ -68,7 +71,9 @@ class Model:
 
 
     def fill(self, data: dict):
-        self._data = copy.deepcopy(data)
+        for k, v in data.items():
+            setattr(self, k, v)
+
 
     def find(self, id: int) -> Model:
         sql = f'''
