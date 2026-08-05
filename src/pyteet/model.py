@@ -18,8 +18,6 @@ class Model:
     _data = {}
     # Model data that has been modified and unsaved
     _dirty = []
-    # Model data NOT for DB mapping
-    extra = {}
 
     def __init_subclass__(cls):
         super().__init_subclass__()
@@ -38,7 +36,6 @@ class Model:
     def __init__(self):
         self._data = {}
         self._dirty = []
-        self.extra = {}
 
 
     def __getattr__(self, name):
@@ -51,18 +48,7 @@ class Model:
             # Normal set
             super().__setattr__(name, value)
         else:
-            # Map to Model data
-            if self._data.get(name, None) == value:
-                # No change
-                return
-            self._data[name] = value
-            if not name in self._dirty:
-                # Mark as dirty
-                self._dirty.append(name)
-
-
-    def copy(self) -> dict:
-        return copy.deepcopy(self._data)
+            self.set(name, value)
 
 
     def creating(self):
@@ -70,9 +56,17 @@ class Model:
         pass
 
 
+    def data(self) -> dict:
+        return copy.deepcopy(self._data)
+
+
+    def dirty(self) -> dict:
+        return copy.deepcopy(self._dirty)
+
+
     def fill(self, data: dict):
         for k, v in data.items():
-            setattr(self, k, v)
+            self.set(k, v)
 
 
     def find(self, id: int) -> Model:
@@ -112,7 +106,7 @@ class Model:
 
     def for_api(self, data=None, recurse=False):
         if not data and not recurse:
-            data = self.copy()
+            data = self.data()
         return jsonify(data)
 
 
@@ -139,11 +133,7 @@ class Model:
             setattr(self, self.UPDATED_AT, dt)
         payload = {}
         for k in self._dirty:
-            v = self._data.get(k)
-            if isinstance(v, str):
-                v = v.strip()
-                self._data[k] = v
-            payload[k] = v
+            payload[k] = self._data.get(k)
         keys = list(payload.keys())
         values = tuple([payload[k] for k in keys])
         if is_insert:
@@ -178,4 +168,20 @@ class Model:
     def saving(self):
         '''Called on save() for INSERT and UPDATE.'''
         pass
+
+
+    def set(self, name, value):
+        # Trim strings
+        if isinstance(value, str):
+            value = value.strip()
+        # Changed?
+        if self._data.get(name) == value:
+            # No change
+            return
+        # Set
+        self._data[name] = value
+        # Is dirty
+        if not name in self._dirty:
+            # Mark as dirty
+            self._dirty.append(name)
 
