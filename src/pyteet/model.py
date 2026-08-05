@@ -113,8 +113,12 @@ class Model:
     def get(self, name, default=None):
         return self._data.get(name, default)
 
-    def is_dirty(self):
+
+    def is_dirty(self, name=None):
+        if name:
+            return name in self._dirty
         return len(self._dirty) > 0
+
 
     def save(self):
         if not self._dirty:
