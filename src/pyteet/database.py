@@ -1,16 +1,18 @@
+from .config import config
+from .utils import logger
+from .utils import parsebool
+from .utils import parseint
+
 import copy
 import re
 import threading
 from pathlib import Path
 
-from .config import config
-from .constants import DATETIME
-from .log import Log
-from .util import parsebool, parseint
-
 _conn_pool = {}
 
-def database(name:str | None = None) -> DBWrap:
+DATETIME = '%Y-%m-%d %H:%M:%S'
+
+def database(name:str | None=None) -> DBWrap:
     if not name:
         name = config('database.default')
         if not name:
@@ -34,24 +36,20 @@ def database(name:str | None = None) -> DBWrap:
 
     raise ValueError(f'{driver} driver not supported.')
 
-
 def database_close():
     match = f'{threading.get_ident()}:'
     keys = [k for k in _conn_pool.keys() if k.startswith(match)]
     for k in keys:
         try:
             _conn_pool[k].close()
-            Log.debug(message=f'closed database connection: {k}')
             del(_conn_pool[k])
         except:
-            Log.error(error=f'close database connection failed: {k}')
-
+            pass
 
 def database_release():
     keys = [k for k in _conn_pool.keys()]
     for k in keys:
         del(_conn_pool[k])
-
 
 class DBWrap:
 
@@ -60,23 +58,20 @@ class DBWrap:
         self.driver = driver
         self.conn_info = conn_info
 
-
     def _fmt_sql(self, sql: str) -> str:
         sql = re.sub(r'\s\s*', ' ', sql)
         return sql.strip().strip(';')
 
-
-    def _pool_add(self, conn):
+    def _pool_add(self, conn: any):
         id = f'{threading.get_ident()}:{self.name}'
-        Log.debug(f'Add connection to pool {id}:{conn}')
+        logger.debug(f'Add connection to pool {id}:{conn}')
         _conn_pool[id] = conn
-
 
     def _pool_get(self):
         id = f'{threading.get_ident()}:{self.name}'
         if id in _conn_pool:
             conn = _conn_pool[id]
-            Log.debug(f'Get connection from pool {id}:{conn}')
+            logger.debug(f'Get connection from pool {id}:{conn}')
             return conn
         return False
 
@@ -119,57 +114,68 @@ class DBWrapMysql(DBWrap):
         self._pool_add(conn)
         return conn
 
-
-    def execute(self, sql: str, bind: tuple | None = None):
+    def execute(self, sql: str, bind: tuple | None=None):
         try:
             conn = self.connect()
             with conn.cursor(**self.cursor_args) as cursor:
                 sql = self._fmt_sql(sql)
                 cursor.execute(sql, bind)
-                Log.sql(sql=cursor.statement)
+                logger.debug('SQL', extra={
+                    'sql': cursor.statement,
+                    })
         except Exception as e:
-            Log.error(error=e, sql=sql, bind=bind)
+            logger.error(repr(e), extra={
+                'sql': sql,
+                })
             raise e
 
-
-    def fetchall(self, sql: str, bind: tuple | None = None) -> dict:
+    def fetchall(self, sql: str, bind: tuple | None=None) -> list:
         try:
             conn = self.connect()
             with conn.cursor(**self.cursor_args) as cursor:
                 sql = self._fmt_sql(sql)
                 cursor.execute(sql, bind)
-                Log.sql(sql=cursor.statement)
+                logger.debug('SQL', extra={
+                    'sql': cursor.statement,
+                    })
                 return cursor.fetchall()
         except Exception as e:
-            Log.error(error=e, sql=sql, bind=bind)
+            logger.error(repr(e), extra={
+                'sql': sql,
+                })
             raise e
 
-
-    def fetchone(self, sql: str, bind: tuple | None = None) -> list:
+    def fetchone(self, sql: str, bind: tuple | None=None) -> dict:
         try:
             conn = self.connect()
             with conn.cursor(**self.cursor_args) as cursor:
                 sql = self._fmt_sql(sql)
                 cursor.execute(sql, bind)
-                Log.sql(sql=cursor.statement)
+                logger.debug('SQL', extra={
+                    'sql': cursor.statement,
+                    })
                 return cursor.fetchone()
         except Exception as e:
-            Log.error(error=e, sql=sql, bind=bind)
+            logger.error(repr(e), extra={
+                'sql': sql,
+                })
             raise e
 
-
-    def insert(self, sql: str, bind: tuple) -> int:
+    def insert(self, sql: str, bind: tuple | None=None) -> int:
         try:
             conn = self.connect()
             with conn.cursor(**self.cursor_args) as cursor:
                 sql = self._fmt_sql(sql)
                 cursor.execute(sql, bind)
-                Log.sql(sql=cursor.statement)
+                logger.debug('SQL', extra={
+                    'sql': cursor.statement,
+                    })
                 return cursor.lastrowid
         except Exception as e:
-            Log.error(error=e, sql=sql, bind=bind)
+            logger.error(repr(e), extra={
+                'sql': sql,
+                })
             raise e
-
 
 class DBWrapPostgres(DBWrap):
 
@@ -202,58 +208,73 @@ class DBWrapPostgres(DBWrap):
         self._pool_add(conn)
         return conn
 
-
-    def execute(self, sql: str, bind: tuple | None = None):
+    def execute(self, sql: str, bind: tuple | None=None):
         try:
             conn = self.connect()
             with conn.cursor(**self.cursor_args) as cursor:
                 sql = self._fmt_sql(sql)
                 cursor.execute(sql, bind)
-                Log.sql(sql=sql, bind=bind)
+                logger.debug('SQL', extra={
+                    'sql': sql,
+                    'bind': bind,
+                    })
         except Exception as e:
-            Log.error(error=e, sql=sql, bind=bind)
+            logger.error(repr(e), extra={
+                'sql': sql,
+                })
             raise e
 
-
-    def fetchall(self, sql: str, bind: tuple | None = None) -> dict:
+    def fetchall(self, sql: str, bind: tuple | None=None) -> list:
         try:
             conn = self.connect()
             with conn.cursor(**self.cursor_args) as cursor:
                 sql = self._fmt_sql(sql)
                 cursor.execute(sql, bind)
-                Log.sql(sql=sql, bind=bind)
+                logger.debug('SQL', extra={
+                    'sql': sql,
+                    'bind': bind,
+                    })
                 return cursor.fetchall()
         except Exception as e:
-            Log.error(error=e, sql=sql, bind=bind)
+            logger.error(repr(e), extra={
+                'sql': sql,
+                })
             raise e
 
-
-    def fetchone(self, sql: str, bind: tuple | None = None) -> list:
+    def fetchone(self, sql: str, bind: tuple | None=None) -> dict:
         try:
             conn = self.connect()
             with conn.cursor(**self.cursor_args) as cursor:
                 sql = self._fmt_sql(sql)
                 cursor.execute(sql, bind)
-                Log.sql(sql=sql, bind=bind)
+                logger.debug('SQL', extra={
+                    'sql': sql,
+                    'bind': bind,
+                    })
                 return cursor.fetchone()
         except Exception as e:
-            Log.error(error=e, sql=sql, bind=bind)
+            logger.error(repr(e), extra={
+                'sql': sql,
+                })
             raise e
 
-
-    def insert(self, sql: str, bind: tuple) -> int:
+    def insert(self, sql: str, bind: tuple | None=None) -> int:
         try:
             conn = self.connect()
             with conn.cursor(**self.cursor_args) as cursor:
                 sql = self._fmt_sql(sql)
                 cursor.execute(sql, bind)
-                Log.sql(sql=sql, bind=bind)
+                logger.debug('SQL', extra={
+                    'sql': sql,
+                    'bind': bind,
+                    })
                 result = cursor.fetchone()
                 return list(result.values()).pop(0)
         except Exception as e:
-            Log.error(error=e, sql=sql, bind=bind)
+            logger.error(repr(e), extra={
+                'sql': sql,
+                })
             raise e
-
 
 class DBWrapSqlite(DBWrap):
 
@@ -270,64 +291,79 @@ class DBWrapSqlite(DBWrap):
         conn.row_factory = sqlite3.Row
         return conn
 
-
-    def execute(self, sql: str, bind: tuple | None = None):
+    def execute(self, sql: str, bind: tuple | None=None):
         try:
             with self.connect() as conn:
                 cursor = conn.cursor()
                 sql = self._fmt_sql(sql)
                 bind = bind if bind else ()
                 cursor.execute(sql, bind)
-                Log.sql(sql=sql, bind=bind)
+                logger.debug('SQL', extra={
+                    'sql': sql,
+                    'bind': bind,
+                    })
         except Exception as e:
-            Log.error(error=e, sql=sql, bind=bind)
+            logger.error(repr(e), extra={
+                'sql': sql,
+                })
             raise e
 
-
-    def fetchall(self, sql: str, bind: tuple | None = None) -> dict:
+    def fetchall(self, sql: str, bind: tuple | None=None) -> list:
         try:
             with self.connect() as conn:
                 cursor = conn.cursor()
                 sql = self._fmt_sql(sql)
                 bind = bind if bind else ()
                 cursor.execute(sql, bind)
-                Log.sql(sql=sql, bind=bind)
+                logger.debug('SQL', extra={
+                    'sql': sql,
+                    'bind': bind,
+                    })
                 rows = cursor.fetchall()
                 rows = [dict(v) for v in rows]
                 return rows
         except Exception as e:
-            Log.error(error=e, sql=sql, bind=bind)
+            logger.error(repr(e), extra={
+                'sql': sql,
+                })
             raise e
 
-
-    def fetchone(self, sql: str, bind: tuple | None = None) -> list:
+    def fetchone(self, sql: str, bind: tuple | None=None) -> dict:
         try:
             with self.connect() as conn:
                 cursor = conn.cursor()
                 sql = self._fmt_sql(sql)
                 bind = bind if bind else ()
                 cursor.execute(sql, bind)
-                Log.sql(sql=sql, bind=bind)
+                logger.debug('SQL', extra={
+                    'sql': sql,
+                    'bind': bind,
+                    })
                 row = cursor.fetchone()
                 return dict(row) if row else None
         except Exception as e:
-            Log.error(error=e, sql=sql, bind=bind)
+            logger.error(repr(e), extra={
+                'sql': sql,
+                })
             raise e
 
-
-    def insert(self, sql: str, bind: tuple) -> int:
+    def insert(self, sql: str, bind: tuple | None=None) -> int:
         try:
             with self.connect() as conn:
                 cursor = conn.cursor()
                 sql = self._fmt_sql(sql)
                 bind = bind if bind else ()
                 cursor.execute(sql, bind)
-                Log.sql(sql=sql, bind=bind)
+                logger.debug('SQL', extra={
+                    'sql': sql,
+                    'bind': bind,
+                    })
                 return cursor.lastrowid
         except Exception as e:
-            Log.error(error=e, sql=sql, bind=bind)
+            logger.error(repr(e), extra={
+                'sql': sql,
+                })
             raise e
-
 
     def _fmt_sql(self, sql: str) -> str:
         sql = re.sub('%s', '?', sql)

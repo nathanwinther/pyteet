@@ -1,9 +1,10 @@
-import copy
-from datetime import datetime, UTC
-
-from .constants import DATETIME
+from .database import DATETIME
 from .database import database
-from .util import jsonify
+from .utils import jsonify
+
+import copy
+from datetime import datetime
+from datetime import UTC
 
 class Model:
 
@@ -32,42 +33,34 @@ class Model:
         if not hasattr(cls, 'CONNECTION'):
             raise TypeError(f'{cls.__name__} must define attribute CONNECTION')
 
-
     def __init__(self):
         self._data = {}
         self._dirty = []
 
-
-    def __getattr__(self, name):
+    def __getattr__(self, name: str) -> any:
         # Method missing hook
         return self._data.get(name)
 
-
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value: any):
         if hasattr(type(self), name):
             # Normal set
             super().__setattr__(name, value)
         else:
             self.set(name, value)
 
-
     def creating(self):
         '''Called on save() for INSERT.'''
         pass
 
-
     def data(self) -> dict:
         return copy.deepcopy(self._data)
 
-
-    def dirty(self) -> dict:
+    def dirty(self) -> list:
         return copy.deepcopy(self._dirty)
-
 
     def fill(self, data: dict):
         for k, v in data.items():
             self.set(k, v)
-
 
     def find(self, id: int) -> Model:
         sql = f'''
@@ -83,8 +76,7 @@ class Model:
         inst._data = data
         return inst
 
-
-    def fetchall(self, sql: str, bind: tuple | None = None) -> list:
+    def fetchall(self, sql: str, bind: tuple | None=None) -> list:
         rows = database(self.CONNECTION).fetchall(sql, bind)
         if not rows:
             return []
@@ -94,8 +86,7 @@ class Model:
             rows[k] = inst
         return rows
 
-
-    def fetchone(self, sql: str, bind: tuple | None = None) -> Model:
+    def fetchone(self, sql: str, bind: tuple | None=None) -> Model:
         data = database(self.CONNECTION).fetchone(sql, bind)
         if not data:
             return None
@@ -103,22 +94,18 @@ class Model:
         inst._data = data
         return inst
 
-
-    def for_api(self, data=None, recurse=False):
-        if not data and not recurse:
+    def for_api(self, data: any | None=None) -> any:
+        if not data:
             data = self.data()
         return jsonify(data)
 
-
-    def get(self, name, default=None):
+    def get(self, name: str, default: any | None=None) -> any:
         return self._data.get(name, default)
 
-
-    def is_dirty(self, name=None):
+    def is_dirty(self, name: str | None=None):
         if name:
             return name in self._dirty
         return len(self._dirty) > 0
-
 
     def save(self):
         if not self._dirty:
@@ -168,13 +155,11 @@ class Model:
             self._dirty = []
             return
 
-
     def saving(self):
         '''Called on save() for INSERT and UPDATE.'''
         pass
 
-
-    def set(self, name, value):
+    def set(self, name: str, value: any):
         # Trim strings
         if isinstance(value, str):
             value = value.strip()

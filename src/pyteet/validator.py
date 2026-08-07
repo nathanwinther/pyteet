@@ -1,7 +1,6 @@
 import re
+from collections.abc import Callable
 from email_validator import validate_email
-
-from .util import pluralize
 
 class Validator:
 
@@ -11,18 +10,15 @@ class Validator:
             self.func = func
             self.kwargs = kwargs
 
-
     def __init__(self):
         self._rules = {}
 
-
-    def add(self, name, func, **kwargs):
+    def add(self, name: str, func: Callable, **kwargs):
         if not name in self._rules:
             self._rules[name] = []
         self._rules[name].append(self.ValidatorRule(func, **kwargs))
 
-
-    def run(self, data):
+    def run(self, data: dict) -> bool, dict:
         ok = True
         errors = {}
         for name, rules in self._rules.items():
@@ -36,18 +32,16 @@ class Validator:
                     break
         return ok, errors
 
-
     @staticmethod
-    def email(name, value):
+    def email(name: str, value: any) -> bool:
         try:
             validate_email(str(value).strip())
             return True, None
         except:
             return False, f'{name} must be a valid email address.'
 
-
     @staticmethod
-    def length(name, value, min=None, max=None):
+    def length(name: str, value: any, min:int | None=None, max:int | None=None) -> bool:
         value = str(value).strip()
         if min:
             if len(value) >= min:
@@ -60,27 +54,24 @@ class Validator:
             else:
                 return False, f'{name} must have maximum {max} characters.'
         return True, None
-
         
     @staticmethod
-    def numeric(name, value):
+    def numeric(name: str, value: str) -> bool:
         try:
             float(str(value).strip())
             return True, None
         except:
             return False, f'{name} must be numeric.'
 
-
     @staticmethod
-    def regex(name, value, pattern=None):
+    def regex(name: str, value: any, pattern: str | None=None) -> bool:
         if re.search(pattern, str(value).strip()):
             return True, None
         else:
             return False, f'{name} is invalid.'
 
-
     @staticmethod
-    def required(name, value):
+    def required(name: str, value: any) -> bool:
         if str(value).strip():
             return True, None
         else:

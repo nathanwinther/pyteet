@@ -1,17 +1,15 @@
 import configparser
 from pathlib import Path
 
-from .log import Log
-
 _config = {}
 
-def config(name: str | None = None, default: any | None = None) -> str:
+def config(name: str | None=None, default: any | None=None) -> str:
     def load_config():
-        Log.debug(message='load config')
         path = Path().cwd() / 'app.ini'
         if not path.exists():
             raise ValueError(f'{path.as_posix()} does not exist.')
         cfg = configparser.ConfigParser()
+        cfg.optionxform = str # Disable lowercase conversion
         cfg.read(path.as_posix())
         for section in cfg.sections():
             if not section in _config:

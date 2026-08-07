@@ -1,6 +1,0 @@
-.DS_Store
-**/.venv/**
-**/__pycache__/**
-app.db
-app.ini
-
