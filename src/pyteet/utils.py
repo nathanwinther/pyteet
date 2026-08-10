@@ -35,7 +35,7 @@ def jsonify(data: any) -> any:
         # Handle Model jsonify
         f = getattr(data, 'for_api')
         if callable(f):
-            return f()
+            return jsonify(f())
     return data
 
 def parsebool(value: any) -> bool:
@@ -61,7 +61,7 @@ def parseint(value: any) -> int:
 
 def send_json(payload: any, status: int | None=200) -> Response:
     return Response(
-            json.dumps(payload),
+            json.dumps(jsonify(payload)),
             mimetype='application/json',
             status=status)
 

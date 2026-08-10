@@ -1,6 +1,5 @@
 from .database import DATETIME
 from .database import database
-from .utils import jsonify
 
 import copy
 from datetime import datetime
@@ -97,7 +96,7 @@ class Model:
     def for_api(self, data: any | None=None) -> any:
         if not data:
             data = self.data()
-        return jsonify(data)
+        return data
 
     def get(self, name: str, default: any | None=None) -> any:
         return self._data.get(name, default)
