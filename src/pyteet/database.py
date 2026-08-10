@@ -41,6 +41,7 @@ def database_close():
     keys = [k for k in _conn_pool.keys() if k.startswith(match)]
     for k in keys:
         try:
+            logger.debug(f'close database connection {k}')
             _conn_pool[k].close()
             del(_conn_pool[k])
         except:
@@ -120,9 +121,7 @@ class DBWrapMysql(DBWrap):
             with conn.cursor(**self.cursor_args) as cursor:
                 sql = self._fmt_sql(sql)
                 cursor.execute(sql, bind)
-                logger.debug('SQL', extra={
-                    'sql': cursor.statement,
-                    })
+                logger.debug(cursor.statement)
         except Exception as e:
             logger.error(repr(e), extra={
                 'sql': sql,
@@ -135,9 +134,7 @@ class DBWrapMysql(DBWrap):
             with conn.cursor(**self.cursor_args) as cursor:
                 sql = self._fmt_sql(sql)
                 cursor.execute(sql, bind)
-                logger.debug('SQL', extra={
-                    'sql': cursor.statement,
-                    })
+                logger.debug(cursor.statement)
                 return cursor.fetchall()
         except Exception as e:
             logger.error(repr(e), extra={
@@ -151,9 +148,7 @@ class DBWrapMysql(DBWrap):
             with conn.cursor(**self.cursor_args) as cursor:
                 sql = self._fmt_sql(sql)
                 cursor.execute(sql, bind)
-                logger.debug('SQL', extra={
-                    'sql': cursor.statement,
-                    })
+                logger.debug(cursor.statement)
                 return cursor.fetchone()
         except Exception as e:
             logger.error(repr(e), extra={
@@ -167,9 +162,7 @@ class DBWrapMysql(DBWrap):
             with conn.cursor(**self.cursor_args) as cursor:
                 sql = self._fmt_sql(sql)
                 cursor.execute(sql, bind)
-                logger.debug('SQL', extra={
-                    'sql': cursor.statement,
-                    })
+                logger.debug(cursor.statement)
                 return cursor.lastrowid
         except Exception as e:
             logger.error(repr(e), extra={
@@ -214,10 +207,7 @@ class DBWrapPostgres(DBWrap):
             with conn.cursor(**self.cursor_args) as cursor:
                 sql = self._fmt_sql(sql)
                 cursor.execute(sql, bind)
-                logger.debug('SQL', extra={
-                    'sql': sql,
-                    'bind': bind,
-                    })
+                logger.debug(sql, extra={'bind': bind})
         except Exception as e:
             logger.error(repr(e), extra={
                 'sql': sql,
@@ -230,10 +220,7 @@ class DBWrapPostgres(DBWrap):
             with conn.cursor(**self.cursor_args) as cursor:
                 sql = self._fmt_sql(sql)
                 cursor.execute(sql, bind)
-                logger.debug('SQL', extra={
-                    'sql': sql,
-                    'bind': bind,
-                    })
+                logger.debug(sql, extra={'bind': bind})
                 return cursor.fetchall()
         except Exception as e:
             logger.error(repr(e), extra={
@@ -247,10 +234,7 @@ class DBWrapPostgres(DBWrap):
             with conn.cursor(**self.cursor_args) as cursor:
                 sql = self._fmt_sql(sql)
                 cursor.execute(sql, bind)
-                logger.debug('SQL', extra={
-                    'sql': sql,
-                    'bind': bind,
-                    })
+                logger.debug(sql, extra={'bind': bind})
                 return cursor.fetchone()
         except Exception as e:
             logger.error(repr(e), extra={
@@ -264,10 +248,7 @@ class DBWrapPostgres(DBWrap):
             with conn.cursor(**self.cursor_args) as cursor:
                 sql = self._fmt_sql(sql)
                 cursor.execute(sql, bind)
-                logger.debug('SQL', extra={
-                    'sql': sql,
-                    'bind': bind,
-                    })
+                logger.debug(sql, extra={'bind': bind})
                 result = cursor.fetchone()
                 return list(result.values()).pop(0)
         except Exception as e:
@@ -298,10 +279,7 @@ class DBWrapSqlite(DBWrap):
                 sql = self._fmt_sql(sql)
                 bind = bind if bind else ()
                 cursor.execute(sql, bind)
-                logger.debug('SQL', extra={
-                    'sql': sql,
-                    'bind': bind,
-                    })
+                logger.debug(sql, extra={'bind': bind})
         except Exception as e:
             logger.error(repr(e), extra={
                 'sql': sql,
@@ -315,10 +293,7 @@ class DBWrapSqlite(DBWrap):
                 sql = self._fmt_sql(sql)
                 bind = bind if bind else ()
                 cursor.execute(sql, bind)
-                logger.debug('SQL', extra={
-                    'sql': sql,
-                    'bind': bind,
-                    })
+                logger.debug(sql, extra={'bind': bind})
                 rows = cursor.fetchall()
                 rows = [dict(v) for v in rows]
                 return rows
@@ -335,10 +310,7 @@ class DBWrapSqlite(DBWrap):
                 sql = self._fmt_sql(sql)
                 bind = bind if bind else ()
                 cursor.execute(sql, bind)
-                logger.debug('SQL', extra={
-                    'sql': sql,
-                    'bind': bind,
-                    })
+                logger.debug(sql, extra={'bind': bind})
                 row = cursor.fetchone()
                 return dict(row) if row else None
         except Exception as e:
@@ -354,10 +326,7 @@ class DBWrapSqlite(DBWrap):
                 sql = self._fmt_sql(sql)
                 bind = bind if bind else ()
                 cursor.execute(sql, bind)
-                logger.debug('SQL', extra={
-                    'sql': sql,
-                    'bind': bind,
-                    })
+                logger.debug(sql, extra={'bind': bind})
                 return cursor.lastrowid
         except Exception as e:
             logger.error(repr(e), extra={

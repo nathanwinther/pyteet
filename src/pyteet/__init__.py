@@ -18,6 +18,7 @@ class Pyteet:
         self.cors_headers = cors_headers
         self.url_map = Map()
         self.errorhandlers = {}
+        self.postrequesthandlers = {}
 
     def __call__(self, environ, start_response):
         return self.wsgi_app(environ, start_response)
@@ -45,6 +46,9 @@ class Pyteet:
             if handler:
                 return handler(e)
             return e
+        finally:
+            for name, func in self.postrequesthandlers.items():
+                func()
 
     def errorhandler(self, code: int):
         def decorate(f):
@@ -57,6 +61,12 @@ class Pyteet:
 
     def post(self, string, endpoint):
         self.url_map.add(Rule(string, endpoint=endpoint, methods=['POST']))
+
+    def postrequesthandler(self, name: str):
+        def decorate(f):
+            self.postrequesthandlers[name] = f
+            return f
+        return decorate
 
     def wsgi_app(self, environ, start_response):
         request = Request(environ)

@@ -18,7 +18,7 @@ class Validator:
             self._rules[name] = []
         self._rules[name].append(self.ValidatorRule(func, **kwargs))
 
-    def run(self, data: dict) -> bool, dict:
+    def run(self, data: dict) -> tuple:
         ok = True
         errors = {}
         for name, rules in self._rules.items():

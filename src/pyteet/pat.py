@@ -1,6 +1,6 @@
 from .database import DATETIME
 from .model import Model
-from .util import parseint
+from .utils import parseint
 
 import hashlib
 import importlib
@@ -49,11 +49,13 @@ class PAT(Model):
                 kwargs['auth_user'] = user
                 # Procced
                 return f(*args, **kwargs)
-            return auth_has_impl
-        return auth_has_wrap
+            return has_any_wrap
+        return has_any_decorate
 
     @staticmethod
     def auth_user(request: Request, abilities: list | None=[]) -> Model:
+        if not request:
+            return None
         if not request.authorization:
             return None
         if request.authorization.type != 'bearer':
@@ -83,7 +85,7 @@ class PAT(Model):
         return f'{self.id}|{self.get_hash_token()}'
 
     @staticmethod
-    def create(tokenable: Model, abilities: list) -> Model:
+    def create(tokenable: Model, abilities: list) -> PAT:
         inst = PAT()
         inst.tokenable_module = tokenable.__module__
         inst.tokenable_class = tokenable.__class__.__name__
