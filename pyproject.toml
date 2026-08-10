@@ -25,10 +25,9 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-  'Flask',
-  'awsgi2',
+  'Werkzeug',
   'email_validator',
-  'flask-cors',
+  'python-json-logger',
 ]
 
 [project.urls]

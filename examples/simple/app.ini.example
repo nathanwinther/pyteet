@@ -2,11 +2,11 @@
 name = My App
 env = production
 
-[cors]
-access_control_allow_origin = '*'
-# access_control_allow_methods = 'GET, POST, OPTIONS'
-# access_control_allow_headers = 'Content-Type, Authorization'
-# access_control_allow_credentials = False
+[cors_headers]
+Access-Control-Allow-Origin = *
+#Access-Control-Allow-Methods = GET, POST, OPTIONS
+#Access-Control-Allow-Headers = Content-Type, Authorization
+#Access-Control-Allow-Credentials = true
 
 [database]
 default = database_sqlite
@@ -20,20 +20,20 @@ default = database_sqlite
 driver = mysql
 host = 127.0.0.1
 port = 3306
-database = docker
-username = root
-password = docker
+database = app
+username = dbuser
+password = dbpass
 autocommit = True
-# ssl_ca = [relative path to pem]
-# ssl_verify_identity = True
+#ssl_ca = relative/path/to/pem
+#ssl_verify_identity = True
 
 [database_postgres]
 driver = postgres
 host = 127.0.0.1
 port = 5432
-database = docker
-username = docker
-password = docker
+database = app
+username = dbuser
+password = dbpass
 autocommit = True
 
 [database_sqlite]
@@ -42,10 +42,10 @@ database = app.db
 autocommit = True
 
 [mail]
-host = [smtp.example.com]
+host = smtp.example.com
 port = 587
 startssl = True
-username = [username]
-password = [password]
-default_sender_name = 'Hello'
+username = mailuser
+password = mailpass
+default_sender_name = Hello
 default_sender_addr = hello@example.com

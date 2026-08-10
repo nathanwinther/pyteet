@@ -2,10 +2,8 @@
 
 A petite [WSGI](https://wsgi.readthedocs.io/)
 web application framework. 
-Use with [Flask](https://flask.palletsprojects.com/en/stable/),
-a simple wrapper around 
-[Werkzeug](https://werkzeug.palletsprojects.com/) and 
-[Jinja](https://jinja.palletsprojects.com/).
+A simple wrapper around 
+[Werkzeug](https://werkzeug.palletsprojects.com/)
 Inspired by
 [Laravel](https://laravel.com).
 
@@ -21,63 +19,7 @@ Inspired by
 python3 -m venv .venv
 source .venv/bin/activate
 python3 -m pip install pyteet
-```
-
-## Commands
-
-View available commands
-
-```console
-python3 -m pyteet
-```
-
-Set up a new project
-
-```console
 python3 -m pyteet init
-cp app.ini.example app.ini
-```
-
-Create your own commands
-
-```console
-python3 -m pyteet make command orders
-```
-
-Create a controller
-
-```console
-python3 -m pyteet make controller contact
-```
-
-Create a model
-
-```console
-python3 -m pyteet make model Contact
-```
-
-Create a database migration
-
-```console
-python3 -m pyteet make migration create_contacts
-```
-
-View database migrations
-
-```console
-python3 -m pyteet migrate status
-```
-
-Run database migrations
-
-```console
-python3 -m pyteet migrate run
-```
-
-Rollback database migrations
-
-```console
-python3 -m pyteet migrate rollback
 ```
 
 ## License

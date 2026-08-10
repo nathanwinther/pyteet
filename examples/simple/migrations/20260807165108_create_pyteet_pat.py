@@ -1,10 +1,9 @@
-from pyteet import database
+from pyteet.database import database
 
-NAME = '20260709144430_create_pyteet_pat'
-CONNECTION = None # Use default database connection
+NAME = '20260807165108_create_pyteet_pat'
 
 def migrate():
-    db = database(CONNECTION)
+    db = database()
     sql = '''
         CREATE TABLE pyteet_pat (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -22,7 +21,7 @@ def migrate():
     db.execute(sql)
 
 def rollback():
-    db = database(CONNECTION)
+    db = database()
     sql = '''
         DROP TABLE pyteet_pat
     '''

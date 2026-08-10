@@ -1,59 +1,70 @@
-import controllers.account
+from pyteet import Pyteet
+from pyteet.config import config
+from pyteet.database import database_close
+from pyteet.utils import logger
+from pyteet.utils import send_json
 
-import awsgi2
-from flask import Flask, request
-from flask_cors import CORS
-from pyteet import Log, config, database_close, send_error, send_success
+app = Pyteet(cors_headers=config('cors_headers'))
 
-app = Flask(__name__)
-CORS(app)
+##############################################################################
+# Application Handlers
+##############################################################################
+
+@app.errorhandler(401)
+def app_unauthorized(e):
+    return send_json({
+        'success': False,
+        'message': 'Unauthorized',
+        }, status=e.code)
 
 @app.errorhandler(403)
-def handle_forbidden(e):
-    return send_error('forbidden', 403)
+def app_forbidden(e):
+    return send_json({
+        'success': False,
+        'message': 'Forbidden',
+        }, status=e.code)
 
 @app.errorhandler(404)
-def handle_notfound(e):
-    return send_error('not found', 404)
+def app_notfound(e):
+    return send_json({
+        'success': False,
+        'message': 'Not found',
+        }, status=e.code)
 
 @app.errorhandler(500)
-def handle_error(e):
-    if hasattr(e, 'original_exception'):
-        Log.fatal(repr(e.original_exception))
-    return send_error('server error', 500)
+def app_error(e):
+    logger.error(repr(e))
+    return send_json({
+        'success': False,
+        'message': 'Server error',
+        }, status=e.code)
 
-@app.teardown_request
-def handle_teardown(e=None):
-    Log.debug('teardown_request')
+@app.postrequesthandler('database')
+def postrequesthandler_database():
     database_close()
 
 ##############################################################################
 # Routes
 ##############################################################################
 
-@app.get('/')
-def home():
-    return send_success({
-        'name': config('app.name'),
-        'environment': config('app.env'),
-        })
+app.get('/', 'home/index')
+app.post('/api/v1/login', 'account/login')
+app.get('/api/v1/me', 'account/index')
+app.post('/api/v1/register', 'account/register')
 
-@app.post('/api/v1/login')
-def api_login():
-    return controllers.account.login(request)
+###############################################################################
+## Lambda wrapper
+###############################################################################
 
-@app.post('/api/v1/register')
-def api_register():
-    return controllers.account.register(request)
-
-@app.get('/api/v1/me')
-def api_me():
-    return controllers.account.index(request)
+#import awsgi2
+#
+#def lambda_handler(event, context):
+#    return awsgi2.response(app, event, context)
 
 ##############################################################################
-# Lambda wrapper
+# Dev server
 ##############################################################################
 
-def lambda_handler(event, context):
-    return awsgi2.response(app, event, context)
-
+if __name__ == "__main__":
+    from werkzeug.serving import run_simple
+    run_simple("127.0.0.1", 5000, app, use_debugger=True, use_reloader=True)

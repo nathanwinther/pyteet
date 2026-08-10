@@ -1,60 +1,83 @@
 from models.contact import Contact
 
-import hashlib
-from pyteet import PersonalAccessToken, Validator, send_error, send_success
+from pyteet.pat import PAT
+from pyteet.utils import jsonify
+from pyteet.utils import send_json
+from pyteet.validator import Validator
 
-@PersonalAccessToken.auth_has_any(['customer'])
+@PAT.has_any(['customer'])
 def index(request, auth_user=None):
-    return send_success(auth_user.for_api())
+    return send_json({
+        'success': True,
+        'message': 'OK',
+        'data': auth_user.for_api(),
+        })
 
 def login(request):
     v = Validator()
-    v.add('email', Validator.required)
-    v.add('email', Validator.email)
-    v.add('password', Validator.required)
+    v.add('email', v.required)
+    v.add('email', v.email)
+    v.add('password', v.required)
     ok, field_errors = v.run(request.form)
-    if not ok:
-        return send_error(field_errors=field_errors)
-    user = Contact.login(
-            request.form.get('email').strip(),
-            request.form.get('password').strip())
-    if not user:
-        return send_error(
-                'Sorry, that email and/or password is invalid!', 401)
-    data = user.for_api()
-    pat = PersonalAccessToken.create(user, ['customer'])
-    data['token'] = pat.bearer()
-    return send_success(data)
+    if ok:
+        contact = Contact.login(
+                request.form.get('email').strip(),
+                request.form.get('password').strip())
+        if contact:
+            data = contact.for_api()
+            pat = PAT.create(contact, ['customer'])
+            data['token'] = pat.bearer()
+            return send_json({
+                'success': True,
+                'message': 'OK',
+                'data': data,
+                })
+        else:
+            return send_json({
+                'success': False,
+                'message': 'Sorry that email and/or password is invalid',
+                }, status=400)
+    else:
+        return send_json({
+            'success': False,
+            'message': 'Form validation failed',
+            'field_errors': field_errors,
+            }, status=400)
 
 def register(request):
-    def compare(name, value, compare_to=''):
-        if str(value).strip() == str(compare_to).strip():
-            return True, None
-        else:
-            return False, 'passwords must match.'
     v = Validator()
-    v.add('firstname', Validator.required)
-    v.add('lastname', Validator.required)
-    v.add('email', Validator.required)
-    v.add('email', Validator.email)
-    v.add('password', Validator.required)
-    v.add('password', 
-          compare,
-          compare_to=request.form.get('password_compare', ''))
+    v.add('email', v.required)
+    v.add('email', v.email)
+    v.add('password', v.required)
+    v.add('firstname', v.required)
+    v.add('lastname', v.required)
     ok, field_errors = v.run(request.form)
-    if not ok:
-        return send_error(field_errors=field_errors)
-    user = Contact()
-    user.firstname = request.form.get('firstname').strip()
-    user.lastname = request.form.get('lastname').strip()
-    user.email = request.form.get('email').strip()
-    user.password = request.form.get('password').strip()
-    try:
-        user.save()
-    except Exception as e:
-        return send_error(field_errors={
-            'email': [
-                'That email address is already in use.',
-                ]})
-    return send_success(user.for_api())
-
+    if ok:
+        contact = Contact()
+        contact.fill({
+            'email': request.form.get('email').strip(),
+            'password': Contact.password_hash(
+                request.form.get('password').strip()),
+            'firstname': request.form.get('firstname').strip(),
+            'lastname': request.form.get('lastname').strip(),
+            })
+        try:
+            contact.save()
+            contact = Contact().find(contact.id)
+            data = contact.for_api()
+            pat = PAT.create(contact, ['customer'])
+            data['token'] = pat.bearer()
+            return send_json({
+                'success': True,
+                'message': 'OK',
+                'data': data,
+                })
+        except Exception as e:
+            logger.error(repr(e))
+            raise e
+    else:
+        return send_json({
+            'success': False,
+            'message': 'Form validation failed',
+            'field_errors': field_errors,
+            }, status=400)
