@@ -10,8 +10,8 @@ Inspired by
 ## Table of Contents
 
 - [Instal](#instal)
-- [Optional Requirements](#optional_requirements)
-- [Dev Server](#dev_server)
+- [Optional Requirements](#optional-requirements)
+- [Dev Server](#dev-server)
 - [License](#license)
 
 ## Instal

@@ -764,6 +764,11 @@ if __name__ == '__main__':
         for k in keys:
             print(k)
             print(f'  {commands[k].DESC}')
+    elif argc == 2 and sys.argv[1] == '-h':
+        keys = sorted(commands.keys())
+        for k in keys:
+            print(k)
+            print(f'  {commands[k].DESC}')
     elif argc > 1:
         cmd = commands.get(sys.argv[1])
         if cmd:
