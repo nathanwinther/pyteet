@@ -517,6 +517,7 @@ class Make(Command):
         path = commands / f'{snake}.py'
         if path.exists():
             print(f'{path} already exists.')
+            return
 
         with open(path.as_posix(), 'w') as w:
             w.write(MAKE_COMMAND.format(name=name, snake=snake))
@@ -534,6 +535,7 @@ class Make(Command):
         path = controllers / f'{name}.py'
         if path.exists():
             print(f'{path} already exists.')
+            return
 
         with open(path.as_posix(), 'w') as w:
             w.write(MAKE_CONTROLLER)
@@ -553,6 +555,7 @@ class Make(Command):
 
         with open(path.as_posix(), 'w') as w:
             w.write(MAKE_MIGRATION.format(name=name))
+
         print(f'created: {path.as_posix()}')
 
     def model(self, name: str):
@@ -565,6 +568,10 @@ class Make(Command):
         file = camel_to_snake(name)
         table = pluralize(file)
         path = models / f'{file}.py'
+
+        if path.exists():
+            print(f'{path} already exists.')
+            return
 
         with open(path.as_posix(), 'w') as w:
             w.write(MAKE_MODEL.format(name=name, table=table))
