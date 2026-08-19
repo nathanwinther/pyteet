@@ -66,7 +66,7 @@ class Model:
             SELECT
                 *
             FROM {self.TABLE}
-            WHERE {self.PRIMARY_KEY} = %s
+            WHERE `{self.PRIMARY_KEY}` = %s
         '''
         data = database(self.CONNECTION).fetchone(sql, (id, ))
         if not data:
@@ -131,7 +131,7 @@ class Model:
                 INSERT INTO {} ({})
                 VALUES ({})
             '''.format(self.TABLE,
-                       ', '.join(keys),
+                       ', '.join([f'`{x}`' for x in keys]),
                        ', '.join(['%s'] * len(values)))
             if db.driver == 'postgres':
                 sql += '''
@@ -145,9 +145,9 @@ class Model:
             sql = '''
                 UPDATE {}
                 SET {}
-                WHERE {} = %s
+                WHERE `{}` = %s
             '''.format(self.TABLE,
-                       ', '.join(['{} = %s'.format(k) for k in keys]),
+                       ', '.join([f'`{x}` = %s' for x in keys]),
                        self.PRIMARY_KEY)
             values += (pk, )
             db.execute(sql, values)
