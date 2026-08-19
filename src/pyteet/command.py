@@ -379,6 +379,10 @@ def _get_migrations():
                     'module': module_name,
                     })
 
+    # Filter out states with UNKNOWN processed state
+    state = [x for x in state if 'processed' in x]
+
+    # Sort
     state = sorted(state, key=itemgetter('migration'))
     return state
 
