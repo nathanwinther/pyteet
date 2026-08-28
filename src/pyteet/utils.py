@@ -58,6 +58,12 @@ def parseint(value: any) -> int:
     except:
         return 0
 
+def send_html(html: str, status: int | None=200) -> Response:
+    return Response(
+            html,
+            mimetype='text/html',
+            status=status)
+
 def send_json(payload: any, status: int | None=200) -> Response:
     return Response(
             json.dumps(jsonify(payload)),

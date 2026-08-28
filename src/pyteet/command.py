@@ -69,8 +69,17 @@ default_sender_addr = hello@example.com
 
 _INIT_APP_PY = '''from pyteet import Pyteet
 from pyteet.config import config
+from pyteet.database import database_close
 
 app = Pyteet(cors_headers=config('cors_headers'))
+
+##############################################################################
+# Application Handlers
+##############################################################################
+
+@app.postrequesthandler('database')
+def postrequesthandler_database():
+    database_close()
 
 ##############################################################################
 # Routes
