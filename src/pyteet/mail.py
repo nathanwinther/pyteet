@@ -3,9 +3,9 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 from .config import config
-from .util import logger
-from .util import parsebool
-from .util import parseint
+from .utils import logger
+from .utils import parsebool
+from .utils import parseint
 
 def send_mail(
         subject: str,
