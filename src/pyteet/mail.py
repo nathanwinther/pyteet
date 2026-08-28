@@ -42,12 +42,12 @@ def send_mail(
 
     try:
         logger.debug('SMTP connect', extra=cfg)
-        with SMTP(cfg('host'), parseint(cfg('port'))) as smtp:
-            if parsebool(cfg('startssl', 'False')):
+        with SMTP(cfg.get('host'), parseint(cfg.get('port'))) as smtp:
+            if parsebool(cfg.get('startssl', 'False')):
                 smtp.ehlo()
                 smtp.starttls()
                 smtp.ehlo()
-            smtp.login(cfg('username', ''), cfg('password', ''))
+            smtp.login(cfg.get('username', ''), cfg.get('password', ''))
             smtp.send_message(msg)
     except Exception as e:
         logger.error(repr(e))
