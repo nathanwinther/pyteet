@@ -8,12 +8,11 @@ from pythonjsonlogger.json import JsonFormatter
 from smtplib import SMTP
 from werkzeug.wrappers import Response
 
-logger = logging.getLogger()
+logger = logging.getLogger('pyteet')
 logHandler = logging.StreamHandler()
 logHandler.setFormatter(JsonFormatter([
     'levelname',
     'message',
-    'asctime',
     'pathname',
     'lineno',
     ]))

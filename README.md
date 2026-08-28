@@ -9,12 +9,12 @@ Inspired by
 
 ## Table of Contents
 
-- [Instal](#instal)
+- [Install](#install)
 - [Optional Requirements](#optional-requirements)
 - [Dev Server](#dev-server)
 - [License](#license)
 
-## Instal
+## Install
 
 ```console
 python3 -m venv .venv
