@@ -1,6 +1,7 @@
 from .database import DATETIME
 from .model import Model
 from .utils import parseint
+from .utils import logger
 
 import hashlib
 import importlib
@@ -78,7 +79,9 @@ class PAT(Model):
         inst.save()
         try:
             return inst.get_tokenable()
-        except:
+        except Exception as e:
+            logger.error('PAT auth_user Error')
+            logger.exception(e)
             return None
 
     def bearer(self) -> str:
@@ -100,10 +103,9 @@ class PAT(Model):
         return hashlib.sha256(self.token.encode('utf-8')).hexdigest()
 
     def get_tokenable(self) -> Model:
-        model = importlib.import_module(self.tokenable_module)
-        class_object = getattr(model, self.tokenable_class)
+        module = importlib.import_module(self.tokenable_module)
+        class_object = getattr(module, self.tokenable_class)
         return class_object().find(self.tokenable_id)
-        
 
     def has_ability(self, ability: str) -> bool:
         inst_abilities = json.loads(self.abilities)

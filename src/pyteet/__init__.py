@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: MIT
 
 import json
-import importlib
 from datetime import datetime
 from werkzeug.datastructures import Headers
 from werkzeug.exceptions import HTTPException
@@ -34,10 +33,7 @@ class Pyteet:
 
         try:
             endpoint, values = adapter.match()
-            segments = endpoint.split('/')
-            handler = segments.pop()
-            module = importlib.import_module('.'.join(['controllers'] + segments))
-            response = getattr(module, handler)(request, **values)
+            response = endpoint(request, **values)
             if self.cors_headers:
                 response.headers.extend(self.cors_headers)
             return response

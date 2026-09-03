@@ -1,3 +1,6 @@
+import controllers.account
+import controllers.home
+
 from pyteet import Pyteet
 from pyteet.config import config
 from pyteet.database import database_close
@@ -47,10 +50,10 @@ def postrequesthandler_database():
 # Routes
 ##############################################################################
 
-app.get('/', 'home/index')
-app.post('/api/v1/login', 'account/login')
-app.get('/api/v1/me', 'account/index')
-app.post('/api/v1/register', 'account/register')
+app.get('/', controllers.home.index)
+app.post('/api/v1/login', controllers.account.login)
+app.get('/api/v1/me', controllers.account.index)
+app.post('/api/v1/register', controllers.account.register)
 
 ###############################################################################
 ## Lambda wrapper
