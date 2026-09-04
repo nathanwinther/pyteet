@@ -478,7 +478,7 @@ class Make(Command):
 
 Commands
 
-command    [name] module name Ex. process_orders
+command    [name] module name Ex. ProcessOrders
 controller [name] module name Ex. orders
 migration  [name] module name Ex. create_orders
 model      [name] class name  Ex. OrderDetail
