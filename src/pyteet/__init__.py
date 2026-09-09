@@ -40,8 +40,11 @@ class Pyteet:
         except HTTPException as e:
             handler = self.errorhandlers.get(str(e.code))
             if handler:
-                return handler(e)
-            return e
+                response = handler(e)
+                if self.cors_headers:
+                    response.headers.extend(self.cors_headers)
+                return response
+            raise e
         finally:
             for name, func in self.postrequesthandlers.items():
                 func()
