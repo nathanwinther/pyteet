@@ -3,7 +3,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 from .config import config
-from .utils import logger
+from .jsonlogging import logger
 from .utils import parsebool
 from .utils import parseint
 
@@ -21,6 +21,7 @@ def send_mail(
         cc = [cc]
 
     cfg = config('mail')
+    logger.debug({'smtp': cfg})
 
     from_name = from_name if from_name else cfg.get('default_sender_name', '')
     from_addr = from_addr if from_addr else cfg.get('default_sender_addr', '')
@@ -41,7 +42,6 @@ def send_mail(
     msg.attach(MIMEText(body, 'html'))
 
     try:
-        logger.debug('SMTP connect', extra=cfg)
         with SMTP(cfg.get('host'), parseint(cfg.get('port'))) as smtp:
             if parsebool(cfg.get('startssl', 'False')):
                 smtp.ehlo()
@@ -50,6 +50,6 @@ def send_mail(
             smtp.login(cfg.get('username', ''), cfg.get('password', ''))
             smtp.send_message(msg)
     except Exception as e:
-        logger.error(repr(e))
+        logger.exception(e)
         raise e
 

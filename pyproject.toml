@@ -27,7 +27,6 @@ classifiers = [
 dependencies = [
   'Werkzeug',
   'email_validator',
-  'python-json-logger',
 ]
 
 [project.urls]

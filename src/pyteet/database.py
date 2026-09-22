@@ -1,5 +1,5 @@
 from .config import config
-from .utils import logger
+from .jsonlogging import logger
 from .utils import parsebool
 from .utils import parseint
 
@@ -123,9 +123,8 @@ class DBWrapMysql(DBWrap):
                 cursor.execute(sql, bind)
                 logger.debug(cursor.statement)
         except Exception as e:
-            logger.error(repr(e), extra={
-                'sql': sql,
-                })
+            logger.error(sql)
+            logger.exception(e)
             raise e
 
     def fetchall(self, sql: str, bind: tuple | None=None) -> list:
@@ -137,9 +136,8 @@ class DBWrapMysql(DBWrap):
                 logger.debug(cursor.statement)
                 return cursor.fetchall()
         except Exception as e:
-            logger.error(repr(e), extra={
-                'sql': sql,
-                })
+            logger.error(sql)
+            logger.exception(e)
             raise e
 
     def fetchone(self, sql: str, bind: tuple | None=None) -> dict:
@@ -151,9 +149,8 @@ class DBWrapMysql(DBWrap):
                 logger.debug(cursor.statement)
                 return cursor.fetchone()
         except Exception as e:
-            logger.error(repr(e), extra={
-                'sql': sql,
-                })
+            logger.error(sql)
+            logger.exception(e)
             raise e
 
     def insert(self, sql: str, bind: tuple | None=None) -> int:
@@ -165,9 +162,8 @@ class DBWrapMysql(DBWrap):
                 logger.debug(cursor.statement)
                 return cursor.lastrowid
         except Exception as e:
-            logger.error(repr(e), extra={
-                'sql': sql,
-                })
+            logger.error(sql)
+            logger.exception(e)
             raise e
 
 class DBWrapPostgres(DBWrap):
@@ -207,11 +203,10 @@ class DBWrapPostgres(DBWrap):
             with conn.cursor(**self.cursor_args) as cursor:
                 sql = self._fmt_sql(sql)
                 cursor.execute(sql, bind)
-                logger.debug(sql, extra={'bind': bind})
+                logger.debug({'sql': sql, 'bind': bind})
         except Exception as e:
-            logger.error(repr(e), extra={
-                'sql': sql,
-                })
+            logger.error(sql)
+            logger.exception(e)
             raise e
 
     def fetchall(self, sql: str, bind: tuple | None=None) -> list:
@@ -220,12 +215,11 @@ class DBWrapPostgres(DBWrap):
             with conn.cursor(**self.cursor_args) as cursor:
                 sql = self._fmt_sql(sql)
                 cursor.execute(sql, bind)
-                logger.debug(sql, extra={'bind': bind})
+                logger.debug({'sql': sql, 'bind': bind})
                 return cursor.fetchall()
         except Exception as e:
-            logger.error(repr(e), extra={
-                'sql': sql,
-                })
+            logger.error(sql)
+            logger.exception(e)
             raise e
 
     def fetchone(self, sql: str, bind: tuple | None=None) -> dict:
@@ -234,12 +228,11 @@ class DBWrapPostgres(DBWrap):
             with conn.cursor(**self.cursor_args) as cursor:
                 sql = self._fmt_sql(sql)
                 cursor.execute(sql, bind)
-                logger.debug(sql, extra={'bind': bind})
+                logger.debug({'sql': sql, 'bind': bind})
                 return cursor.fetchone()
         except Exception as e:
-            logger.error(repr(e), extra={
-                'sql': sql,
-                })
+            logger.error(sql)
+            logger.exception(e)
             raise e
 
     def insert(self, sql: str, bind: tuple | None=None) -> int:
@@ -248,13 +241,12 @@ class DBWrapPostgres(DBWrap):
             with conn.cursor(**self.cursor_args) as cursor:
                 sql = self._fmt_sql(sql)
                 cursor.execute(sql, bind)
-                logger.debug(sql, extra={'bind': bind})
+                logger.debug({'sql': sql, 'bind': bind})
                 result = cursor.fetchone()
                 return list(result.values()).pop(0)
         except Exception as e:
-            logger.error(repr(e), extra={
-                'sql': sql,
-                })
+            logger.error(sql)
+            logger.exception(e)
             raise e
 
 class DBWrapSqlite(DBWrap):
@@ -279,11 +271,10 @@ class DBWrapSqlite(DBWrap):
                 sql = self._fmt_sql(sql)
                 bind = bind if bind else ()
                 cursor.execute(sql, bind)
-                logger.debug(sql, extra={'bind': bind})
+                logger.debug({'sql': sql, 'bind': bind})
         except Exception as e:
-            logger.error(repr(e), extra={
-                'sql': sql,
-                })
+            logger.error(sql)
+            logger.exception(e)
             raise e
 
     def fetchall(self, sql: str, bind: tuple | None=None) -> list:
@@ -293,14 +284,13 @@ class DBWrapSqlite(DBWrap):
                 sql = self._fmt_sql(sql)
                 bind = bind if bind else ()
                 cursor.execute(sql, bind)
-                logger.debug(sql, extra={'bind': bind})
+                logger.debug({'sql': sql, 'bind': bind})
                 rows = cursor.fetchall()
                 rows = [dict(v) for v in rows]
                 return rows
         except Exception as e:
-            logger.error(repr(e), extra={
-                'sql': sql,
-                })
+            logger.error(sql)
+            logger.exception(e)
             raise e
 
     def fetchone(self, sql: str, bind: tuple | None=None) -> dict:
@@ -310,13 +300,12 @@ class DBWrapSqlite(DBWrap):
                 sql = self._fmt_sql(sql)
                 bind = bind if bind else ()
                 cursor.execute(sql, bind)
-                logger.debug(sql, extra={'bind': bind})
+                logger.debug({'sql': sql, 'bind': bind})
                 row = cursor.fetchone()
                 return dict(row) if row else None
         except Exception as e:
-            logger.error(repr(e), extra={
-                'sql': sql,
-                })
+            logger.error(sql)
+            logger.exception(e)
             raise e
 
     def insert(self, sql: str, bind: tuple | None=None) -> int:
@@ -326,12 +315,11 @@ class DBWrapSqlite(DBWrap):
                 sql = self._fmt_sql(sql)
                 bind = bind if bind else ()
                 cursor.execute(sql, bind)
-                logger.debug(sql, extra={'bind': bind})
+                logger.debug({'sql': sql, 'bind': bind})
                 return cursor.lastrowid
         except Exception as e:
-            logger.error(repr(e), extra={
-                'sql': sql,
-                })
+            logger.error(sql)
+            logger.exception(e)
             raise e
 
     def _fmt_sql(self, sql: str) -> str:

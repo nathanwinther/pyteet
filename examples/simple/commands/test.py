@@ -2,7 +2,10 @@ from models.contact import Contact
 
 import argparse
 import json
+from datetime import datetime
 from pyteet.command import Command
+from pyteet.jsonlogging import logger
+from pyteet.utils import jsonify
 
 class Test(Command):
 
@@ -26,10 +29,10 @@ class Test(Command):
 
         contact = Contact().fetchone(sql, (email, ))
         if contact:
-            print('Found contact')
-            print(json.dumps(contact.for_api(), indent=2))
+            logger.info(f'Found contact for {email}')
+            logger.debug(jsonify(contact.for_api()))
         else:
-            print('Create contact')
+            logger.info('Create contact')
             contact = Contact()
             contact.fill({
                 'email': email,
@@ -38,5 +41,6 @@ class Test(Command):
                 'lastname': 'Winther',
                 })
             contact.save()
-            print(json.dumps(contact.for_api(), indent=2))
+            contact = Contact().find(contact.id)
+            logger.debug(jsonify(contact.for_api()))
 

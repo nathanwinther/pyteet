@@ -4,7 +4,7 @@ import controllers.home
 from pyteet import Pyteet
 from pyteet.config import config
 from pyteet.database import database_close
-from pyteet.utils import logger
+from pyteet.jsonlogging import logger
 from pyteet.utils import send_json
 
 app = Pyteet(cors_headers=config('cors_headers'))
@@ -36,7 +36,9 @@ def app_notfound(e):
 
 @app.errorhandler(500)
 def app_error(e):
-    logger.error(repr(e))
+    if e.original_exception:
+        logger.exception(e.original_exception)
+    logger.exception(e)
     return send_json({
         'success': False,
         'message': 'Server error',

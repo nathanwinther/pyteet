@@ -111,7 +111,7 @@ class Model:
             # Nothing to save
             return
         pk = getattr(self, self.PRIMARY_KEY)
-        dt = datetime.now(UTC).strftime(DATETIME)
+        dt = datetime.now(UTC)
         db = database(self.CONNECTION)
         is_insert = pk == None
         if is_insert:

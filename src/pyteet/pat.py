@@ -1,7 +1,7 @@
 from .database import DATETIME
+from .jsonlogging import logger
 from .model import Model
 from .utils import parseint
-from .utils import logger
 
 import hashlib
 import importlib
@@ -80,7 +80,6 @@ class PAT(Model):
         try:
             return inst.get_tokenable()
         except Exception as e:
-            logger.error('PAT auth_user Error')
             logger.exception(e)
             return None
 

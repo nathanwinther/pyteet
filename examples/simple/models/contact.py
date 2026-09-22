@@ -38,7 +38,7 @@ class Contact(Model):
             data.get('firstname', '').strip(),
             data.get('lastname', '').strip(),
             ]).strip()
-        return super().for_api(data)
+        return data
 
     @staticmethod
     def password_hash(string: str) -> str:

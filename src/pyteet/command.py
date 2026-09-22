@@ -2,7 +2,7 @@ from .config import config
 from .database import DATETIME
 from .database import database
 from .database import database_close
-from .utils import logger
+from .jsonlogging import logger
 from .utils import parseint
 
 import argparse
@@ -287,7 +287,8 @@ def get_commands() -> dict:
                 if validate(inst):
                     commands[inst.NAME] = inst
         except Exception as e:
-            logger.error(repr(e))
+            logger.error(e)
+            logger.exception(e)
 
     # Merge built-in commands
     return commands | {

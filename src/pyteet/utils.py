@@ -1,23 +1,11 @@
 import json
-import logging
 import os
+from datetime import date
 from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from pythonjsonlogger.json import JsonFormatter
 from smtplib import SMTP
 from werkzeug.wrappers import Response
-
-logger = logging.getLogger('pyteet')
-logHandler = logging.StreamHandler()
-logHandler.setFormatter(JsonFormatter([
-    'levelname',
-    'message',
-    'pathname',
-    'lineno',
-    ]))
-logger.addHandler(logHandler)
-logger.setLevel(os.environ.get('PYTEET_LOG_LEVEL', 'ERROR'))
 
 def jsonify(data: any) -> any:
     if isinstance(data, dict):
@@ -28,8 +16,10 @@ def jsonify(data: any) -> any:
         for k, v in enumerate(data):
             data[k] = jsonify(v)
         return data
+    if isinstance(data, date):
+        return data.isoformat()
     if isinstance(data, datetime):
-        return data.strftime('%Y-%m-%d %H:%M:%S')
+        return data.isoformat()
     if hasattr(data, 'for_api'):
         # Handle Model jsonify
         f = getattr(data, 'for_api')

@@ -6,6 +6,7 @@ import json
 from datetime import datetime
 from werkzeug.datastructures import Headers
 from werkzeug.exceptions import HTTPException
+from werkzeug.exceptions import InternalServerError
 from werkzeug.routing import Map
 from werkzeug.routing import Rule
 from werkzeug.wrappers import Request
@@ -41,6 +42,14 @@ class Pyteet:
             handler = self.errorhandlers.get(str(e.code))
             if handler:
                 response = handler(e)
+                if self.cors_headers:
+                    response.headers.extend(self.cors_headers)
+                return response
+            raise e
+        except Exception as e:
+            handler = self.errorhandlers.get('500')
+            if handler:
+                response = handler(InternalServerError(original_exception=e))
                 if self.cors_headers:
                     response.headers.extend(self.cors_headers)
                 return response
