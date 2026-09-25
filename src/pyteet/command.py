@@ -264,7 +264,13 @@ def get_commands() -> dict:
                 return False
         return True
 
-    commands = {}
+    commands = {
+            Env.NAME: Env(),
+            Init.NAME: Init(),
+            Make.NAME: Make(),
+            Migrate.NAME: Migrate(),
+            PAT.NAME: PAT(),
+            }
 
     # Get app command path
     path = Path().cwd() / 'commands'
@@ -290,14 +296,7 @@ def get_commands() -> dict:
             logger.error(e)
             logger.exception(e)
 
-    # Merge built-in commands
-    return commands | {
-            Env.NAME: Env(),
-            Init.NAME: Init(),
-            Make.NAME: Make(),
-            Migrate.NAME: Migrate(),
-            PAT.NAME: PAT(),
-            }
+    return commands
 
 def _camel_to_snake(value: str) -> str:
     value = re.sub(r'([A-Z]+)([A-Z][a-z])', r'\1_\2', value)
