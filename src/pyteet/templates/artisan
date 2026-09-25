@@ -1,0 +1,12 @@
+#!/bin/sh
+
+if [ -d ".venv/bin/activate" ]; then
+  source .venv/bin/activate
+fi
+
+if [[ "$#" -eq 1 && "$1" == "serve" ]]; then
+  python3 -m app
+else
+  python3 -m pyteet $*
+fi
+
