@@ -76,6 +76,9 @@ class Pyteet:
             return f
         return decorate
 
+    def route(self, string, endpoint, methods):
+        self.url_map.add(Rule(string, endpoint=endpoint, methods=methods))
+
     def wsgi_app(self, environ, start_response):
         request = Request(environ)
         response = self.dispatch_request(request)
